@@ -16,6 +16,10 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "allowJs": true,
+    "lib": ["es2018", "es2020", "esnext.asynciterable", "DOM"],
+    "types": ["jest", "node"]
+  },
+  "include": ["src/**/*", "typings/**/*", "test/**/*"]
 }
