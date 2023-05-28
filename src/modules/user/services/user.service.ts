@@ -134,20 +134,4 @@ export class UserService extends BaseService {
       message: 'Change user password successful',
     };
   }
-
-  //   async softDelete(id: string): Promise<boolean> {
-  //     const data = await this.userRepository.findOneBy({ id });
-  //     if (!data) throw new NotFoundException('User not found');
-
-  //     const foundLocationBySubject = await this.subjectRepository.findBy({
-  //       locationId: id,
-  //     });
-  //     if (isEmpty(foundLocationBySubject)) {
-  //       const { affected } = await this.userRepository.softDelete(id);
-  //       return affected === 1;
-  //     } else
-  //       throw new BadRequestException(
-  //         'Can not delete Location because this Location is associated with an existing Subject',
-  //       );
-  //   }
 }
