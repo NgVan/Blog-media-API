@@ -173,7 +173,7 @@ export class ConfigService {
   }
 
   get authenticationSecret(): string {
-    return this.envConfig['SECRET'] || 'JWT TOKENS SECRET';
+    return this.envConfig['JWT_SECRET'] || 'JWT TOKENS SECRET';
   }
 
   get authEmailAddressClaim(): string {

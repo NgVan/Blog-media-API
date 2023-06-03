@@ -22,3 +22,7 @@ export const SUCCESS = 'Success';
 export const DTO_DEFAULT_VALUE = 1;
 
 export const expiredImageTime = 21600;
+
+export const jwtConstants = {
+  secret: 'BlogSecretKey',
+};

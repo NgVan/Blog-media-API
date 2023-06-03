@@ -33,8 +33,10 @@ import { UserUpdateDto } from './dtos/request/user-update.dto';
 import { UserChangePasswordDto } from './dtos/request/user-change-password.dto';
 import { UserQueryDto } from './dtos/request/user-quey.dto';
 import { UserFilterDto } from './dtos/response/user-filter.dto';
+import { JwtAuthGuard } from '../auth/guards/auth.guard';
 
 @ApiTags('Users')
+@ApiBearerAuth('access-token')
 @Controller('user')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class UserController {
@@ -95,6 +97,7 @@ export class UserController {
     description: SUCCESS,
     type: UserFilterDto,
   })
+  // @UseGuards(AuthGuard)
   //   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @HttpCode(HttpStatus.OK)
   @Get('Filter')
@@ -111,6 +114,7 @@ export class UserController {
   //   @IsSelf(true)
   //   @Permissions(SystemPermissionTypes.VIEW_DETAIL_USER)
   //   @RequiredIn(RequiredInTypes.PARAMS)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':userId')
   getUserProfile(
@@ -130,3 +134,4 @@ export class UserController {
     return this.userService.softDelete(id);
   }
 }
+//f0611acf-1920-4283-aaad-965c315fc331

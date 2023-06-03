@@ -134,4 +134,9 @@ export class UserService extends BaseService {
       message: 'Change user password successful',
     };
   }
+
+  async findUser(emailAddress: string): Promise<any> {
+    const user = await this.userRepository.findOneBy({ emailAddress });
+    return user;
+  }
 }

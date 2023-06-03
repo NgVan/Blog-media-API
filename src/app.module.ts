@@ -8,6 +8,7 @@ import { UserRoleModule } from './modules/user-role/user-role.module';
 import { PostModule } from './modules/post/post.module';
 import { ConfigService } from './modules/shared/services/config.service';
 import { SharedModule } from './modules/shared/shared.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SharedModule } from './modules/shared/shared.module';
     RoleModule,
     UserRoleModule,
     PostModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
