@@ -48,6 +48,7 @@ export class UserController {
     description: SUCCESS,
     type: UserDto,
   })
+  @UseGuards(JwtAuthGuard)
   //   @UseGuards(JwtAuthGuard, PermissionsGuard)
   //   @Permissions(SystemPermissionTypes.ADD_USER)
   //   @RequiredIn(RequiredInTypes.BODY)
@@ -66,6 +67,7 @@ export class UserController {
     description: SUCCESS,
     type: UserDto,
   })
+  @UseGuards(JwtAuthGuard)
   //   @UseGuards(JwtAuthGuard, PermissionsGuard)
   //   @Permissions(SystemPermissionTypes.ADD_USER)
   //   @RequiredIn(RequiredInTypes.BODY)
@@ -81,6 +83,7 @@ export class UserController {
 
   @ApiOperation({ summary: 'Change user password' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS })
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Patch('change-password/:userId')
   changeUserPassword(
@@ -97,8 +100,7 @@ export class UserController {
     description: SUCCESS,
     type: UserFilterDto,
   })
-  // @UseGuards(AuthGuard)
-  //   @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get('Filter')
   getList(
@@ -110,11 +112,11 @@ export class UserController {
 
   @ApiOperation({ summary: 'Get One User' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: UserDto })
+  @UseGuards(JwtAuthGuard)
   //   @UseGuards(JwtAuthGuard, PermissionsGuard)
   //   @IsSelf(true)
   //   @Permissions(SystemPermissionTypes.VIEW_DETAIL_USER)
   //   @RequiredIn(RequiredInTypes.PARAMS)
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':userId')
   getUserProfile(
@@ -127,6 +129,7 @@ export class UserController {
   @ApiOperation({ summary: 'Delete One User' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: Boolean })
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   //   @Permissions(SystemPermissionTypes.DELETE_LOCATION)
   //   @RequiredIn(RequiredInTypes.PARAMS)
   @Delete(':userId')
