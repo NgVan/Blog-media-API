@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '../../shared/services/config.service';
-// import { AuthorizationService } from '../authentication.service';
+import { Request } from 'express';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthLocalJwtStrategy extends PassportStrategy(
@@ -10,17 +11,20 @@ export class AuthLocalJwtStrategy extends PassportStrategy(
   'local-jwt',
 ) {
   constructor(
-    private configService: ConfigService, // private authService: AuthorizationService,
+    private configService: ConfigService,
+    private authService: AuthService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.authenticationSecret,
+      secretOrKey: configService.jwtAccessTokenSecret,
+      passReqToCallback: true,
     });
   }
-  async validate(payload: any): Promise<any> {
+  async validate(req: Request, payload: any): Promise<any> {
     console.log('Validate payload: ', payload);
-    // const currentUser = await this.authService.OnCustomTokenValidated(payload);
-    return payload;
+    const accessToken = req.get('Authorization').replace('Bearer', '').trim();
+    const hasAccessToken = await this.authService.hasAccessToken(accessToken);
+    return !hasAccessToken ? null : payload;
   }
 }

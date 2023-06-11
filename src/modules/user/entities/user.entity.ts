@@ -1,6 +1,7 @@
 // import { UserRoleEntity } from './user-role.entity';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { AbstractEntity } from '../../../database/entities/abstract.entity';
+import { AuthEntity } from 'src/modules/auth/entities/auth.entity';
 // import { UserOrganizationEntity } from './user-organization.entity';
 // import { PositionEntity } from '../../position/entities/position.entity';
 // import { ImageEntity } from '../../image/entities/image.entity';
@@ -26,4 +27,7 @@ export class UserEntity extends AbstractEntity {
 
   @Column({ type: 'varchar', length: 100 })
   password: string;
+
+  // @OneToOne(() => AuthEntity, (auth) => auth.user) // specify inverse side as a second parameter
+  // auth: AuthEntity;
 }

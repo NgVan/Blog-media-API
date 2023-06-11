@@ -164,16 +164,24 @@ export class ConfigService {
     return this.envConfig['AUTH0_CLIENT_SECRET'] || '';
   }
 
-  get customTokenExpirationDay(): number {
-    return this.int(this.envConfig['CUSTOM_TOKEN_EXPIRATION_DAY'], 1);
+  get accessTokenHour(): number {
+    return this.int(this.envConfig['ACCESS_TOKEN_HOUR'], 1);
+  }
+
+  get refreshTokenDay(): number {
+    return this.int(this.envConfig['REFRESH_TOKEN_DAY'], 1);
   }
 
   get authenticationMethod(): string {
     return this.envConfig['AUTHENTICATION_METHOD'] || '';
   }
 
-  get authenticationSecret(): string {
+  get jwtAccessTokenSecret(): string {
     return this.envConfig['JWT_SECRET'] || 'JWT TOKENS SECRET';
+  }
+
+  get jwtRefreshTokenSecret(): string {
+    return this.envConfig['JWT_REFRESH_SECRET'] || 'JWT REFRESH SECRET';
   }
 
   get authEmailAddressClaim(): string {

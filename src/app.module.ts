@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { RoleModule } from './modules/role/role.module';
 import { UserRoleModule } from './modules/user-role/user-role.module';
-import { PostModule } from './modules/post/post.module';
+// import { PostModule } from './modules/post/post.module';
 import { ConfigService } from './modules/shared/services/config.service';
 import { SharedModule } from './modules/shared/shared.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -21,7 +21,7 @@ import { AuthModule } from './modules/auth/auth.module';
     UserModule,
     RoleModule,
     UserRoleModule,
-    PostModule,
+    // PostModule,
     AuthModule,
   ],
   controllers: [AppController],
