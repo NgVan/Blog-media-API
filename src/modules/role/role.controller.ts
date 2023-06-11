@@ -45,7 +45,7 @@ export class RoleController {
     description: SUCCESS,
     type: RoleDto,
   })
-  //   @UseGuards(JwtAuthGuard, PermissionsGuard)
+  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
   //   @Permissions(SystemPermissionTypes.ADD_USER)
   //   @RequiredIn(RequiredInTypes.BODY)
   @HttpCode(HttpStatus.CREATED)
@@ -63,7 +63,7 @@ export class RoleController {
     description: SUCCESS,
     type: RoleDto,
   })
-  //   @UseGuards(JwtAuthGuard, PermissionsGuard)
+  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
   //   @Permissions(SystemPermissionTypes.ADD_USER)
   //   @RequiredIn(RequiredInTypes.BODY)
   @HttpCode(HttpStatus.OK)
@@ -82,7 +82,7 @@ export class RoleController {
     description: SUCCESS,
     type: RoleFilterDto,
   })
-  //   @UseGuards(JwtAuthGuard, PermissionsGuard)
+  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
   @HttpCode(HttpStatus.OK)
   @Get('Filter')
   getList(
@@ -94,7 +94,7 @@ export class RoleController {
 
   @ApiOperation({ summary: 'Get One Role' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: RoleDto })
-  //   @UseGuards(JwtAuthGuard, PermissionsGuard)
+  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
   //   @IsSelf(true)
   //   @Permissions(SystemPermissionTypes.VIEW_DETAIL_USER)
   //   @RequiredIn(RequiredInTypes.PARAMS)

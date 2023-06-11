@@ -18,7 +18,7 @@ import { SignUpDto } from './dtos/request/signup.dto';
 import { ForgotPasswordDto } from './dtos/request/forgotPassword.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { AppRequest } from 'src/utils/app-request';
-import { JwtAuthGuard } from './guards/auth.guard';
+import { AccessTokenGuard } from './guards/auth.guard';
 
 @ApiTags('Auths')
 @Controller('auth')
@@ -69,7 +69,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Log out' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AccessTokenGuard)
   @Get('logout')
   logout(@Req() request: AppRequest) {
     return this.authService.logout(request);

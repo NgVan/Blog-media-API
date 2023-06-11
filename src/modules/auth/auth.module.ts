@@ -6,8 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AbstractEntity } from 'src/database/entities/abstract.entity';
 import { UserEntity } from '../user/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/utils/constant';
-import { AuthLocalJwtStrategy } from './strategies/local-jwt.strategy';
+import { AccessTokenStrategy } from './strategies/local-jwt.strategy';
 import { ConfigService } from '../shared/services/config.service';
 import { EmailService } from '../shared/services/mail.service';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
@@ -26,7 +25,7 @@ import { AuthEntity } from './entities/auth.entity';
   ],
   providers: [
     AuthService,
-    AuthLocalJwtStrategy,
+    AccessTokenStrategy,
     RefreshTokenStrategy,
     EmailService,
   ],

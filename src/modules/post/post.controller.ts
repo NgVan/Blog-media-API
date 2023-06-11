@@ -33,7 +33,7 @@
 // import { UserChangePasswordDto } from './dtos/request/user-change-password.dto';
 // import { UserQueryDto } from './dtos/request/user-quey.dto';
 // import { UserFilterDto } from './dtos/response/user-filter.dto';
-// import { JwtAuthGuard } from '../auth/guards/auth.guard';
+// import { AccessTokenGuard } from '../auth/guards/auth.guard';
 
 // @ApiTags('Posts')
 // @ApiBearerAuth('access-token')
@@ -48,7 +48,7 @@
 //     description: SUCCESS,
 //     type: UserDto,
 //   })
-//   @UseGuards(JwtAuthGuard)
+//   @UseGuards(AccessTokenGuard)
 //   @HttpCode(HttpStatus.CREATED)
 //   @Post()
 //   create(
@@ -64,8 +64,8 @@
 //     description: SUCCESS,
 //     type: UserDto,
 //   })
-//   @UseGuards(JwtAuthGuard)
-//   //   @UseGuards(JwtAuthGuard, PermissionsGuard)
+//   @UseGuards(AccessTokenGuard)
+//   //   @UseGuards(AccessTokenGuard, PermissionsGuard)
 //   //   @Permissions(SystemPermissionTypes.ADD_USER)
 //   //   @RequiredIn(RequiredInTypes.BODY)
 //   @HttpCode(HttpStatus.OK)
@@ -80,7 +80,7 @@
 
 //   @ApiOperation({ summary: 'Change user password' })
 //   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS })
-//   @UseGuards(JwtAuthGuard)
+//   @UseGuards(AccessTokenGuard)
 //   @HttpCode(HttpStatus.OK)
 //   @Patch('change-password/:userId')
 //   changeUserPassword(
@@ -97,7 +97,7 @@
 //     description: SUCCESS,
 //     type: UserFilterDto,
 //   })
-//   @UseGuards(JwtAuthGuard)
+//   @UseGuards(AccessTokenGuard)
 //   @HttpCode(HttpStatus.OK)
 //   @Get('Filter')
 //   getList(
@@ -109,8 +109,8 @@
 
 //   @ApiOperation({ summary: 'Get One User' })
 //   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: UserDto })
-//   @UseGuards(JwtAuthGuard)
-//   //   @UseGuards(JwtAuthGuard, PermissionsGuard)
+//   @UseGuards(AccessTokenGuard)
+//   //   @UseGuards(AccessTokenGuard, PermissionsGuard)
 //   //   @IsSelf(true)
 //   //   @Permissions(SystemPermissionTypes.VIEW_DETAIL_USER)
 //   //   @RequiredIn(RequiredInTypes.PARAMS)
@@ -126,7 +126,7 @@
 //   @ApiOperation({ summary: 'Delete One User' })
 //   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: Boolean })
 //   @HttpCode(HttpStatus.OK)
-//   @UseGuards(JwtAuthGuard)
+//   @UseGuards(AccessTokenGuard)
 //   //   @Permissions(SystemPermissionTypes.DELETE_LOCATION)
 //   //   @RequiredIn(RequiredInTypes.PARAMS)
 //   @Delete(':userId')

@@ -6,7 +6,7 @@ import { Request } from 'express';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
-export class AuthLocalJwtStrategy extends PassportStrategy(
+export class AccessTokenStrategy extends PassportStrategy(
   Strategy,
   'local-jwt',
 ) {
