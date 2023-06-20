@@ -19,7 +19,6 @@ import { Repository } from 'typeorm';
 import { EmailService } from '../../shared/services/mail.service';
 import { ForgotPasswordDto } from '../dtos/request/forgotPassword.dto';
 import { AuthEntity } from '../entities/auth.entity';
-import { RequestContext } from 'src/utils/request-context';
 import { AppRequest } from 'src/utils/app-request';
 import { ResetPasswordDto } from '../dtos/request/resetPassword.dto';
 
@@ -92,6 +91,7 @@ export class AuthService {
   }
 
   async signUp(payload: SignUpDto): Promise<any> {
+    const { frontendURL } = new ConfigService();
     const { userName, emailAddress, password, passwordConfirm } = payload;
 
     const foundUser = await this.userRepository.findOneBy({ emailAddress });
@@ -121,7 +121,7 @@ export class AuthService {
     await this.authRepository.save({ ...tokens, userId: user.id });
 
     // Send mail to inform user that signup is successful
-    const url = `http://localhost:8080/Dashboard`; // URL: should send Dashboard
+    const url = `${frontendURL}/Dashboard`; // URL: should send Dashboard
     const emailTilte = '[Media Blog] Welcom! You are signup successfully';
     await this.emailService.sendSignupMail(emailAddress, emailTilte, url);
 
@@ -150,6 +150,7 @@ export class AuthService {
   }
 
   async forgotPassword(payload: ForgotPasswordDto): Promise<any> {
+    const { frontendURL } = new ConfigService();
     const { emailAddress } = payload;
     const foundUser = await this.userRepository.findOneBy({
       emailAddress,
@@ -160,7 +161,7 @@ export class AuthService {
     const tokens = this.getTokens(foundUser);
 
     // url : là trỏ đến đường dẫn của Frontend
-    const url = `http://localhost:8080/reset-password/${tokens.accessToken}`;
+    const url = `${frontendURL}/reset-password/${tokens.accessToken}`;
 
     const emailTilte = 'Reset your password';
     await this.emailService.sendMail(emailAddress, emailTilte, url);
@@ -174,6 +175,7 @@ export class AuthService {
     context: AppRequest,
     payload: ResetPasswordDto,
   ): Promise<any> {
+    const { frontendURL } = new ConfigService();
     const { user } = context;
     const { newPassword, confirmNewPassword } = payload;
 
@@ -203,7 +205,7 @@ export class AuthService {
     await this.authRepository.delete({ userId: user.sub });
 
     // Send mail to inform user that reset password is successful
-    const url = `http://localhost:8080/Dashboard`; // URL: should send Dashboard
+    const url = `${frontendURL}/Dashboard`; // URL: should send Dashboard
     const emailTilte =
       '[Media Blog] Welcom! You are reset password successfully';
     await this.emailService.sendResetMail(user.email, emailTilte, url);

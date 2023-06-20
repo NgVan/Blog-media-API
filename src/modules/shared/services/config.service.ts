@@ -259,6 +259,10 @@ export class ConfigService {
     return this.envConfig['APP_PASSWORD'] || '';
   }
 
+  get frontendURL(): string {
+    return this.envConfig['URL_REACT'] || '';
+  }
+
   get configJson(): any {
     const entities = [
       path.join(__dirname + '/../../../**/*.entity{.ts,.js}'),
