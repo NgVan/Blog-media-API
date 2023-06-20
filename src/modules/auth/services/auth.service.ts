@@ -21,6 +21,7 @@ import { ForgotPasswordDto } from '../dtos/request/forgotPassword.dto';
 import { AuthEntity } from '../entities/auth.entity';
 import { RequestContext } from 'src/utils/request-context';
 import { AppRequest } from 'src/utils/app-request';
+import { ResetPasswordDto } from '../dtos/request/resetPassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -119,6 +120,11 @@ export class AuthService {
     const tokens = this.getTokens(user);
     await this.authRepository.save({ ...tokens, userId: user.id });
 
+    // Send mail to inform user that signup is successful
+    const url = `http://localhost:8080/Dashboard`; // URL: should send Dashboard
+    const emailTilte = '[Media Blog] Welcom! You are signup successfully';
+    await this.emailService.sendSignupMail(emailAddress, emailTilte, url);
+
     return {
       data: tokens,
       message: 'Sign up user account successfully',
@@ -145,7 +151,6 @@ export class AuthService {
 
   async forgotPassword(payload: ForgotPasswordDto): Promise<any> {
     const { emailAddress } = payload;
-    const { refreshTokenDay } = new ConfigService();
     const foundUser = await this.userRepository.findOneBy({
       emailAddress,
     });
@@ -154,15 +159,58 @@ export class AuthService {
 
     const tokens = this.getTokens(foundUser);
 
-    const url = `http://localhost:3000/resetPassword/${tokens.refreshToken}`;
-    // sendEmail(emailAddress, url, 'Reset your password');
+    // url : là trỏ đến đường dẫn của Frontend
+    const url = `http://localhost:8080/reset-password/${tokens.accessToken}`;
 
-    // return {
-    //   success:
-    //     'Send email reset your password successful! Please check your email',
-    // };
     const emailTilte = 'Reset your password';
-    return await this.emailService.sendMail(emailAddress, emailTilte, url);
+    await this.emailService.sendMail(emailAddress, emailTilte, url);
+    return {
+      message:
+        'Forgot password link sent to your email with time duration is 2 hours. Please check your email',
+    };
+  }
+
+  async resetPassword(
+    context: AppRequest,
+    payload: ResetPasswordDto,
+  ): Promise<any> {
+    const { user } = context;
+    const { newPassword, confirmNewPassword } = payload;
+
+    const foundUser = await this.userRepository.findOneBy({ id: user.id });
+    if (!foundUser) throw new NotFoundException('User not found');
+
+    if (!validatePassword(newPassword))
+      throw new BadRequestException('Invalid Password!');
+    if (newPassword !== confirmNewPassword)
+      throw new BadRequestException('Confirm password not match with password');
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    try {
+      // Update/reset user password in DB
+      await this.userRepository.save({
+        id: user.sub,
+        emailAddress: user.email,
+        password: hashedPassword,
+      });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+
+    // Delete token and refresh-token after reset password successfully
+    await this.authRepository.delete({ userId: user.sub });
+
+    // Send mail to inform user that reset password is successful
+    const url = `http://localhost:8080/Dashboard`; // URL: should send Dashboard
+    const emailTilte =
+      '[Media Blog] Welcom! You are reset password successfully';
+    await this.emailService.sendResetMail(user.email, emailTilte, url);
+
+    return {
+      message: 'Reset password successfully. You need to login again',
+    };
   }
 
   async logout(context: AppRequest): Promise<any> {

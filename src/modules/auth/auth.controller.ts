@@ -19,6 +19,7 @@ import { ForgotPasswordDto } from './dtos/request/forgotPassword.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { AppRequest } from 'src/utils/app-request';
 import { AccessTokenGuard } from './guards/auth.guard';
+import { ResetPasswordDto } from './dtos/request/resetPassword.dto';
 
 @ApiTags('Auths')
 @Controller('auth')
@@ -65,6 +66,14 @@ export class AuthController {
   @Post('forgot-password')
   forgotPassword(@Body() payload: ForgotPasswordDto) {
     return this.authService.forgotPassword(payload);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password' })
+  @UseGuards(AccessTokenGuard)
+  @Post('reset-password/:token')
+  resetPassword(@Req() request: AppRequest, @Body() payload: ResetPasswordDto) {
+    return this.authService.resetPassword(request, payload);
   }
 
   @HttpCode(HttpStatus.OK)

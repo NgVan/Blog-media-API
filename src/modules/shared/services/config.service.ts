@@ -251,6 +251,14 @@ export class ConfigService {
     return this.int(this.envConfig['USER_VERIFICATION_EXPIRATION_DAY'], 1);
   }
 
+  get rootEmail(): string {
+    return this.envConfig['GMAIL_USER'] || '';
+  }
+
+  get rootEmailAppPass(): string {
+    return this.envConfig['APP_PASSWORD'] || '';
+  }
+
   get configJson(): any {
     const entities = [
       path.join(__dirname + '/../../../**/*.entity{.ts,.js}'),
