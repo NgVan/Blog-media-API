@@ -6,13 +6,7 @@ export class UserUpdateDto {
   @IsString()
   @IsOptional()
   @Length(1, 100)
-  firstName: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @Length(1, 100)
-  lastName: string;
+  fullName: string;
 
   @ApiProperty()
   @IsString()
