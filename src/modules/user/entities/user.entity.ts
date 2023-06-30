@@ -10,7 +10,7 @@ export const USER_TABLE = 'user';
 
 @Entity(USER_TABLE)
 export class UserEntity extends AbstractEntity {
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 100 })
   fullName: string;
 
   @Column({ type: 'varchar', length: 100, unique: true })

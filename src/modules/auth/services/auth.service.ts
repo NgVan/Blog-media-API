@@ -15,7 +15,7 @@ import { SignUpDto } from '../dtos/request/signup.dto';
 import { validatePassword } from 'src/utils/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { EmailService } from '../../shared/services/mail.service';
 import { ForgotPasswordDto } from '../dtos/request/forgotPassword.dto';
 import { AuthEntity } from '../entities/auth.entity';
@@ -80,10 +80,27 @@ export class AuthService {
       throw new UnauthorizedException('Email or password is incorrect');
 
     const tokens = this.getTokens(user);
-    const foundAuth = await this.authRepository.findOneBy({ userId: user.id });
+    const foundAuth = await this.authRepository
+      .createQueryBuilder('auth')
+      .where('auth.userId = :userId', { userId: user.id })
+      .andWhere('auth.refreshToken IS NOT NULL')
+      .getOne();
+    console.log({ foundAuth });
     if (!foundAuth)
-      await this.authRepository.save({ ...tokens, userId: user.id });
-    else await this.authRepository.save({ ...tokens, id: foundAuth.id });
+      await this.authRepository.save({
+        ...tokens,
+        userId: user.id,
+      });
+    // Tạo mới record
+    else {
+      const updateAuthToken = await this.authRepository.save({
+        ...tokens,
+        id: foundAuth.id,
+      });
+      // Update record
+      console.log({ updateAuthToken });
+    }
+
     return {
       data: tokens,
       message: 'Sign in successfully',
@@ -108,8 +125,7 @@ export class AuthService {
     try {
       // Create user in DB
       user = await this.userRepository.save({
-        firstName: userName,
-        lastName: userName,
+        fullName: userName,
         emailAddress,
         password: hashedPassword,
       });
@@ -121,7 +137,7 @@ export class AuthService {
     await this.authRepository.save({ ...tokens, userId: user.id });
 
     // Send mail to inform user that signup is successful
-    const url = `${frontendURL}/Dashboard`; // URL: should send Dashboard
+    const url = frontendURL; // URL: should send Dashboard
     const emailTilte = '[Media Blog] Welcom! You are signup successfully';
     await this.emailService.sendSignupMail(emailAddress, emailTilte, url);
 
@@ -159,7 +175,10 @@ export class AuthService {
       throw new NotFoundException('User does not exist in system');
 
     const tokens = this.getTokens(foundUser);
-
+    await this.authRepository.save({
+      accessToken: tokens.accessToken,
+      userId: foundUser.id,
+    });
     // url : là trỏ đến đường dẫn của Frontend
     const url = `${frontendURL}/reset-password/${tokens.accessToken}`;
 
@@ -205,7 +224,7 @@ export class AuthService {
     await this.authRepository.delete({ userId: user.sub });
 
     // Send mail to inform user that reset password is successful
-    const url = `${frontendURL}/Dashboard`; // URL: should send Dashboard
+    const url = frontendURL; // URL: should send Dashboard
     const emailTilte =
       '[Media Blog] Welcom! You are reset password successfully';
     await this.emailService.sendResetMail(user.email, emailTilte, url);
@@ -218,9 +237,11 @@ export class AuthService {
   async logout(context: AppRequest): Promise<any> {
     const { user } = context;
 
-    const foundAuth = await this.authRepository.findOneBy({
-      userId: user.sub,
-    });
+    const foundAuth = await this.authRepository
+      .createQueryBuilder('auth')
+      .where('auth.userId = :userId', { userId: user.sub })
+      .andWhere('auth.refreshToken IS NOT NULL')
+      .getOne();
     if (!foundAuth) throw new ForbiddenException('Access Denied');
     await this.authRepository.delete(foundAuth.id);
     return {
