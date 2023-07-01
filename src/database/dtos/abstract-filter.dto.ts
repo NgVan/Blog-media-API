@@ -7,10 +7,10 @@ export class AbstractFilterDto {
   @ApiProperty({
     required: false,
     default: DEFAULT_VALUE_FILTER.PAGE,
-    minimum: 0,
+    minimum: 1,
   })
   @IsInt()
-  @Min(0)
+  @Min(1)
   @Type(() => Number)
   @IsOptional()
   page?: number = DEFAULT_VALUE_FILTER.PAGE;
@@ -25,8 +25,4 @@ export class AbstractFilterDto {
   @Type(() => Number)
   @IsOptional()
   limit?: number = DEFAULT_VALUE_FILTER.LIMIT;
-
-  @ApiProperty({ required: false, default: DEFAULT_VALUE_FILTER.WITH_DELETED })
-  @IsOptional()
-  withDeleted?: boolean = DEFAULT_VALUE_FILTER.WITH_DELETED;
 }

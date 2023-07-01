@@ -30,14 +30,13 @@ export class BaseService {
     const {
       page = DEFAULT_VALUE_FILTER.PAGE,
       limit = DEFAULT_VALUE_FILTER.LIMIT,
-      withDeleted,
     } = filterParam;
     const totalSkip = page * limit;
 
     const [result, total] = await this.baseRepository.findAndCount({
       take: limit,
       skip: totalSkip,
-      withDeleted: withDeleted?.toString() === 'true',
+      // withDeleted: withDeleted?.toString() === 'true',
     });
 
     return {

@@ -1,5 +1,5 @@
 export const DEFAULT_VALUE_FILTER = {
-  PAGE: 0,
+  PAGE: 1,
   LIMIT: 20,
   SEARCH_QUERY: '',
   WITH_DELETED: false,
