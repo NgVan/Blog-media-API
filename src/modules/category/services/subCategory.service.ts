@@ -3,16 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCatDto } from '../dtos/request/createCat.dto';
-import { UpdateCatDto } from '../dtos/request/updateCat.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CatQueryDto } from '../dtos/request/CatQuery.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
-import { SubCategoryEntity } from '../entities/subcategory.entity';
+import { SubCategoryEntity } from 'src/modules/category/entities/subcategory.entity';
 import { SubCatCreateDto } from '../dtos/request/subCat-create.dto';
 import { SubCatUpdateDto } from '../dtos/request/subCat-update.dto';
-import { SubCategoryDto } from '../dtos/response/subCat.dto';
 
 @Injectable()
 export class SubCategoryService {
