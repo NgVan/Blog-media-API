@@ -19,7 +19,6 @@ import { SUCCESS } from 'src/utils/constant';
 import { AccessTokenGuard } from '../auth/guards/auth.guard';
 import { AppRequest } from 'src/utils/app-request';
 import { CatQueryDto } from './dtos/request/CatQuery.dto';
-import { CatFilterDto } from './dtos/response/cat-filter.dto';
 import { SubCategoryService } from './services/subCategory.service';
 import { SubCategoryDto } from './dtos/response/subCat.dto';
 import { SubCatCreateDto } from './dtos/request/subCat-create.dto';
@@ -28,13 +27,13 @@ import { SubCatFilterDto } from './dtos/response/subcat-filter.dto';
 
 @ApiTags('SubCategories')
 @Controller('subcategory')
-@UseGuards(AccessTokenGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class SubCategoryController {
   constructor(private subCategoryService: SubCategoryService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create Sub-Category' })
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS,
@@ -46,6 +45,7 @@ export class SubCategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update Sub-Category' })
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
@@ -88,6 +88,7 @@ export class SubCategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete Sub-Category' })
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,

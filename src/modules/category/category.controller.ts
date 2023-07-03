@@ -27,13 +27,13 @@ import { CatFilterDto } from './dtos/response/cat-filter.dto';
 
 @ApiTags('Categories')
 @Controller('category')
-@UseGuards(AccessTokenGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create Category' })
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS,
@@ -45,6 +45,7 @@ export class CategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update Category' })
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
@@ -87,6 +88,7 @@ export class CategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete Category' })
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
