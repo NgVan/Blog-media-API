@@ -7,9 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CatQueryDto } from '../dtos/request/CatQuery.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
-import { SubCategoryEntity } from 'src/modules/category/entities/subcategory.entity';
 import { SubCatCreateDto } from '../dtos/request/subCat-create.dto';
 import { SubCatUpdateDto } from '../dtos/request/subCat-update.dto';
+import { SubCategoryEntity } from '../entities/subcategory.entity';
 
 @Injectable()
 export class SubCategoryService {

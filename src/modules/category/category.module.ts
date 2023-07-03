@@ -4,10 +4,10 @@ import { CategoryController } from './category.controller';
 import { SharedModule } from '../shared/shared.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryEntity } from 'src/modules/category/entities/category.entity';
-import { SubCategoryEntity } from 'src/modules/category/entities/subcategory.entity';
 import { AbstractEntity } from '../../database/entities/abstract.entity';
 import { SubCategoryController } from './subCategory.controller';
 import { SubCategoryService } from './services/subCategory.service';
+import { SubCategoryEntity } from './entities/subcategory.entity';
 
 @Module({
   controllers: [CategoryController, SubCategoryController],

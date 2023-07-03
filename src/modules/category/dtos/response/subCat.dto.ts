@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDto } from 'src/database/dtos/abstract.dto';
-import { SubCategoryEntity } from 'src/modules/category/entities/subcategory.entity';
 import { CategoryEntity } from '../../entities/category.entity';
+import { SubCategoryEntity } from '../../entities/subcategory.entity';
 
 export class SubCategoryDto extends AbstractDto {
   constructor(subCategoryEntity: SubCategoryEntity = <SubCategoryEntity>{}) {
