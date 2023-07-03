@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../../database/entities/abstract.entity';
-import { SubCategoryEntity } from './subcategory.entity';
+import { SubCategoryEntity } from './subCategory.entity';
 
 export const CATEGORY_TABLE = 'category';
 

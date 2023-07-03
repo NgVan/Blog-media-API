@@ -7,7 +7,7 @@ import { CategoryEntity } from 'src/modules/category/entities/category.entity';
 import { AbstractEntity } from '../../database/entities/abstract.entity';
 import { SubCategoryController } from './subCategory.controller';
 import { SubCategoryService } from './services/subCategory.service';
-import { SubCategoryEntity } from './entities/subcategory.entity';
+import { SubCategoryEntity } from './entities/subCategory.entity';
 
 @Module({
   controllers: [CategoryController, SubCategoryController],

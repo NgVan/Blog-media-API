@@ -9,7 +9,7 @@ import { CatQueryDto } from '../dtos/request/CatQuery.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import { SubCatCreateDto } from '../dtos/request/subCat-create.dto';
 import { SubCatUpdateDto } from '../dtos/request/subCat-update.dto';
-import { SubCategoryEntity } from '../entities/subcategory.entity';
+import { SubCategoryEntity } from '../entities/subCategory.entity';
 
 @Injectable()
 export class SubCategoryService {
