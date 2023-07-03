@@ -12,6 +12,6 @@ export class SubCategoryEntity extends AbstractEntity {
   @Column({ type: 'varchar', length: 36 })
   categoryId: string;
 
-  @ManyToOne(() => CategoryEntity, (category) => category.subCategorys)
+  @ManyToOne(() => CategoryEntity, (category) => category.subCategories)
   category: CategoryEntity;
 }

@@ -17,7 +17,7 @@ export class CategoryEntity extends AbstractEntity {
       cascade: true,
     },
   )
-  subCategorys: SubCategoryEntity[];
+  subCategories: SubCategoryEntity[];
 }
 
 // Category  1 : n Subcategory

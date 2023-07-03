@@ -7,7 +7,7 @@ export class CategoryDto extends AbstractDto {
   constructor(categoryEntity: CategoryEntity = <CategoryEntity>{}) {
     super(categoryEntity);
     this.name = categoryEntity.name;
-    this.subCategory = categoryEntity.subCategorys;
+    this.subCategory = categoryEntity.subCategories;
   }
   @ApiProperty({ required: false })
   name: string;
