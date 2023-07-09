@@ -1,139 +1,185 @@
-// import {
-//     BadRequestException,
-//     ConflictException,
-//     HttpStatus,
-//     Injectable,
-//     NotFoundException,
-//   } from '@nestjs/common';
-//   import { Repository, DataSource, Brackets, In } from 'typeorm';
-//   import { InjectRepository } from '@nestjs/typeorm';
-//   import { get, isEmpty, omit } from 'lodash';
-//   import { ConfigService } from '../../shared/services/config.service';
-//   import { RequestContext } from '../../../utils/request-context';
-//   import { validatePassword } from 'src/utils/utils';
-//   import { BaseService } from 'src/database/services/base.service';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Repository, DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { get } from 'lodash';
+import { ConfigService } from '../../shared/services/config.service';
+import { RequestContext } from '../../../utils/request-context';
+import { BaseService } from 'src/database/services/base.service';
+import { PostEntity } from '../entities/post.entity';
+import { PostCreateDto } from '../dtos/request/post-create.dto';
+import { ContentEntity } from '../entities/content.entity';
+import { PostDto } from '../dtos/response/post.dto';
+import { AbstractFilterDto } from 'src/database/dtos/abstract-filter.dto';
+import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
+import { PostUpdateDto } from '../dtos/request/post-update.dto';
 
-//   @Injectable()
-//   export class PostService extends BaseService {
-//     constructor(
-//       private dataSource: DataSource,
+@Injectable()
+export class PostService extends BaseService {
+  constructor(
+    private dataSource: DataSource,
 
-//       @InjectRepository(UserEntity)
-//       private userRepository: Repository<PostEntity>,
-//       // @InjectRepository(RoleEntity)
-//       // private roleRepository: Repository<RoleEntity>,
+    @InjectRepository(PostEntity)
+    private postRepository: Repository<PostEntity>,
+    @InjectRepository(ContentEntity)
+    private contentRepository: Repository<ContentEntity>,
 
-//       // private imageService: ImageService,
-//       // private auth0Service: Auth0Service,
-//       // private userVerificationService: UserVerificationService,
-//       // private userRoleService: UserRoleService,
-//       // private userOrganizationService: UserOrganizationService,
-//       // private organizationService: OrganizationService,
+    private configService: ConfigService,
+  ) {
+    super(postRepository, 'Post');
+  }
 
-//       // private emailService: EmailService,
-//       private configService: ConfigService,
-//     ) {
-//       super(userRepository, 'User');
-//     }
+  async create(context: RequestContext, payload: PostCreateDto): Promise<any> {
+    const { title, subCategoryId, contents } = payload;
+    const userName = get(context, 'user.userName');
+    console.log({ title, subCategoryId, contents, userName });
+    let post: any;
+    try {
+      post = await this.postRepository.save({
+        title,
+        subCategoryId,
+        author: userName,
+      });
+      console.log({ post });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
 
-//     async signup(context: RequestContext, payload: UserSignupDto): Promise<any> {
-//       const { emailAddress } = payload;
+    const createdContents = contents.map((content: any, index) => {
+      return {
+        type: content.type,
+        value: content.value,
+        displayOrder: index + 1,
+        postId: post.id,
+      };
+    });
+    console.log({ createdContents });
+    try {
+      const contentList = await this.contentRepository.insert(createdContents);
+      console.log({ contentList });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
 
-//       // const requestOrganizationId = get(context, 'user.currentUser.organizations[0].organizationId', null);
+    return {
+      data: new PostDto(post),
+      message: 'Create post successfully',
+    };
+  }
 
-//       // if (requestOrganizationId && !organizationId) {
-//       //   throw new BadRequestException('organizationId is required');
-//       // }
-//       // if (!isEmpty(roleIds)) {
-//       //   const roles = await this.roleRepository.findBy({ id: In(roleIds) });
-//       //   if (roles.find((r) => r.level === SystemRoleLevel.ORGANIZATION_ADMIN) && !organizationId) {
-//       //     throw new BadRequestException('organizationId is required');
-//       //   }
-//       // }
+  async update(payload: PostUpdateDto, id: string): Promise<any> {
+    const { title, contents } = payload;
+    const foundPost = await this.postRepository.findOneBy({ id });
 
-//       const checkExistedUser = await this.userRepository.findOneBy({
-//         emailAddress,
-//       });
-//       if (checkExistedUser)
-//         throw new ConflictException('User has already conflicted');
+    if (title) {
+      try {
+        await this.postRepository.save({
+          id,
+          title,
+        });
+      } catch (error) {
+        throw new BadRequestException(error);
+      }
+    }
+    if (contents) {
+      // When update Post with content
+      // First: Find old content
+      // Second: create new content
+      // Third: if create new successfully, then delete old content
 
-//       let user: any;
-//       try {
-//         // Create user in DB
-//         user = await this.userRepository.save({
-//           ...payload,
-//         });
-//       } catch (error) {
-//         throw new BadRequestException(error);
-//       }
-//       return await this.getUserProfile(context, user.id);
-//     }
+      // First:
+      const oldContent = await this.contentRepository.findBy({
+        postId: foundPost.id,
+      });
+      // const oldContentId = oldContent.map((content) => content.id);
 
-//     async updateUser(
-//       context: RequestContext,
-//       payload: any,
-//       id: string,
-//     ): Promise<UserDto> {
-//       const user = await this.userRepository.findOneBy({ id });
-//       if (!user) throw new NotFoundException('User not found');
-//       if (isEmpty(payload)) throw new BadRequestException('Body is required');
+      // Second
+      const createdContents = contents.map((content: any, index) => {
+        return {
+          type: content.type,
+          value: content.value,
+          displayOrder: index + 1,
+          postId: foundPost.id,
+        };
+      });
+      try {
+        await this.contentRepository.insert(createdContents);
+      } catch (error) {
+        throw new BadRequestException(error);
+      }
 
-//       try {
-//         await this.userRepository.save({
-//           id: user.id,
-//           ...omit(payload, ['password', 'emailAddress']),
-//         });
-//       } catch (error) {
-//         throw new BadRequestException('Update user fail');
-//       }
+      // Third
+      try {
+        // const deleteResult = await this.contentRepository
+        //   .createQueryBuilder()
+        //   .delete()
+        //   .where('id IN (:...ids)', { ids: oldContentId })
+        //   .execute();
 
-//       return this.getUserProfile(context, user.id);
-//     }
+        // const deletedCount = deleteResult.affected;
+        // console.log(`Deleted ${deletedCount} content items.`);
+        await this.contentRepository.remove(oldContent);
+      } catch (error) {
+        throw new BadRequestException(error);
+      }
+    }
+    return {
+      message: 'Update post successfully',
+    };
+  }
 
-//     async getUserProfile(_context: RequestContext, id: string): Promise<UserDto> {
-//       const data = await this.userRepository.findOneBy({ id });
-//       if (!data) throw new NotFoundException('User not found');
-//       const userDto = new UserDto(data);
+  async getOne(id: string): Promise<PostDto> {
+    const foundPost = await this.postRepository.findOneBy({ id });
+    if (!foundPost) throw new NotFoundException('Not found post');
 
-//       return <UserDto>omit(userDto);
-//     }
+    // const post = new PostDto(foundPost);
+    // return post;
+    return foundPost.toDto();
+  }
 
-//     async changeUserPassword(
-//       _context: RequestContext,
-//       payload: any,
-//       id: string,
-//     ): Promise<any> {
-//       const { currentPassword, newPassword, newPasswordConfirm } = payload;
-//       const user = await this.userRepository.findOneBy({ id });
-//       if (!user) throw new NotFoundException('User not found');
+  async getList(filter: AbstractFilterDto): Promise<any> {
+    const {
+      page = DEFAULT_VALUE_FILTER.PAGE,
+      limit = DEFAULT_VALUE_FILTER.LIMIT,
+    } = filter;
+    const totalSkip = limit * (page - 1);
 
-//       if (user.password !== currentPassword)
-//         throw new BadRequestException('Current password is incorrect');
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .innerJoinAndSelect('post.contents', 'c')
+      .orderBy('c.displayOrder', 'ASC')
+      .take(limit)
+      .skip(totalSkip);
+    const [res, total] = await query.clone().getManyAndCount();
 
-//       if (!validatePassword(newPassword))
-//         throw new BadRequestException('Invalid Password!');
+    // const [res, total] = await this.postRepository.findAndCount({
+    //   take: limit,
+    //   skip: totalSkip,
+    //   relations: ['contents'], // Lấy cả danh sách nội dung
+    //   order: { 'contents.displayOrder': 'ASC' }, // Sắp xếp theo displayOrder
+    // });
 
-//       if (newPassword !== newPasswordConfirm)
-//         throw new BadRequestException(
-//           'Confirm password not match with new password',
-//         );
+    return {
+      entities: res,
+      totalEntities: total,
+    };
+  }
 
-//       try {
-//         await this.userRepository.save({
-//           id: user.id,
-//           password: newPassword,
-//         });
-//       } catch (error) {
-//         throw new BadRequestException('Change user password fail');
-//       }
-//       return {
-//         status: HttpStatus.OK,
-//         message: 'Change user password successful',
-//       };
-//     }
-
-//     async findUser(emailAddress: string): Promise<any> {
-//       const user = await this.userRepository.findOneBy({ emailAddress });
-//       return user;
-//     }
-//   }
+  async delete(id: string): Promise<any> {
+    const foundPost = await this.postRepository.findOneBy({ id });
+    if (!foundPost) throw new NotFoundException('Not found post');
+    try {
+      await this.contentRepository.delete({ postId: foundPost.id });
+      await this.postRepository.delete(foundPost.id);
+    } catch (error) {
+      throw new BadRequestException(error);
+      // throw error;
+    }
+    return {
+      message: 'Delete post successfully',
+    };
+  }
+}

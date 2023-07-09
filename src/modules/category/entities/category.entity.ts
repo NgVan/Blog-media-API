@@ -21,6 +21,8 @@ export class CategoryEntity extends AbstractEntity {
 }
 
 // Category  1 : n Subcategory
+// Post      1 : n Content
+// Sub-cate  1 : n Post
 // Location  1 : n Subject
 // render, netlify, cyclic
 // vercel

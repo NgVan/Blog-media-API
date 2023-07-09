@@ -52,6 +52,7 @@ export class AuthService {
       {
         sub: user?.id,
         email: user?.emailAddress,
+        userName: user?.fullName,
         iat: Math.round(new Date().getTime() / 1000),
         exp: Math.round(moment(accessTokenExpiredDate).valueOf() / 1000),
       },
@@ -61,6 +62,7 @@ export class AuthService {
       {
         sub: user?.id,
         email: user?.emailAddress,
+        userName: user?.fullName,
         iat: Math.round(new Date().getTime() / 1000),
         exp: Math.round(moment(refreshTokenExpiredDate).valueOf() / 1000),
       },

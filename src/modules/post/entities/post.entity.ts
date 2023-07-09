@@ -1,29 +1,37 @@
-// // import { UserRoleEntity } from './user-role.entity';
-// import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
-// import { AbstractEntity } from '../../../database/entities/abstract.entity';
-// // import { UserOrganizationEntity } from './user-organization.entity';
-// // import { PositionEntity } from '../../position/entities/position.entity';
-// // import { ImageEntity } from '../../image/entities/image.entity';
+import { Column, Entity, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { AbstractEntity } from '../../../database/entities/abstract.entity';
+import { ContentEntity } from './content.entity';
+import { SubCategoryEntity } from 'src/modules/category/entities/subCategory.entity';
+import { PostDto } from '../dtos/response/post.dto';
 
-// export const USER_TABLE = 'post';
+export const POST_TABLE = 'post';
 
-// @Entity(USER_TABLE)
-// export class PostEntity extends AbstractEntity {
-//   @Column({ type: 'varchar', length: 50 })
-//   firstName: string;
+@Entity(POST_TABLE)
+export class PostEntity extends AbstractEntity {
+  @Column({ type: 'varchar', length: 255 })
+  title: string;
 
-//   @Column({ type: 'varchar', length: 50 })
-//   lastName: string;
+  @Column({ type: 'varchar', length: 50 })
+  author: string;
 
-//   @Column({ type: 'varchar', length: 100, unique: true })
-//   emailAddress: string;
+  @Column({ type: 'varchar', length: 36 })
+  subCategoryId: string;
 
-//   @Column({ type: 'boolean' })
-//   emailVerified: boolean;
+  @OneToMany(() => ContentEntity, (content: any) => content.post, {
+    eager: true,
+    cascade: true,
+  })
+  // @JoinColumn()
+  contents: ContentEntity[];
 
-//   @Column({ type: 'varchar', length: 20 })
-//   phoneNumber: string;
+  @ManyToOne(() => SubCategoryEntity, (subCate) => subCate.posts)
+  subCategory: SubCategoryEntity;
 
-//   @Column({ type: 'varchar', length: 100 })
-//   password: string;
-// }
+  toDto(): PostDto {
+    const dto = new PostDto(this);
+    dto.contents = this.contents.sort(
+      (a, b) => a.displayOrder - b.displayOrder,
+    ); // Sắp xếp theo displayOrder
+    return dto;
+  }
+}

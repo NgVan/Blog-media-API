@@ -1,22 +1,22 @@
-// import { ApiProperty } from '@nestjs/swagger';
-// import { IsString, IsOptional, Length } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsString,
+  Length,
+  IsNotEmpty,
+  IsArray,
+  NotEquals,
+  IsOptional,
+} from 'class-validator';
 
-// export class UserUpdateDto {
-//   @ApiProperty()
-//   @IsString()
-//   @IsOptional()
-//   @Length(1, 100)
-//   firstName: string;
+export class PostUpdateDto {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  @Length(1, 255)
+  title: string;
 
-//   @ApiProperty()
-//   @IsString()
-//   @IsOptional()
-//   @Length(1, 100)
-//   lastName: string;
-
-//   @ApiProperty()
-//   @IsString()
-//   @IsOptional()
-//   @Length(1, 20)
-//   phoneNumber: string;
-// }
+  @ApiProperty()
+  @IsArray()
+  @IsOptional()
+  contents?: object[];
+}

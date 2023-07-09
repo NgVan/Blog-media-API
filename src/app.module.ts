@@ -10,6 +10,7 @@ import { ConfigService } from './modules/shared/services/config.service';
 import { SharedModule } from './modules/shared/shared.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategoryModule } from './modules/category/category.module';
+import { PostModule } from './modules/post/post.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CategoryModule } from './modules/category/category.module';
     // PostModule,
     AuthModule,
     CategoryModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
