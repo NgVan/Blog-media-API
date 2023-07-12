@@ -20,7 +20,7 @@ import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { AppRequest } from 'src/utils/app-request';
 import { AccessTokenGuard } from './guards/auth.guard';
 import { ResetPasswordDto } from './dtos/request/resetPassword.dto';
-
+import { AuthGuard } from '@nestjs/passport';
 @ApiTags('Auths')
 @Controller('auth')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -82,5 +82,18 @@ export class AuthController {
   @Get('logout')
   logout(@Req() request: AppRequest) {
     return this.authService.logout(request);
+  }
+
+  @Get()
+  @UseGuards(AuthGuard('google'))
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async googleAuth(@Req() req) {}
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Signin via google' })
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req) {
+    return this.authService.googleLogin(req);
   }
 }

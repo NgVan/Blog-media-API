@@ -255,4 +255,56 @@ export class AuthService {
     const foundToken = await this.authRepository.findOneBy({ accessToken });
     return !foundToken ? null : foundToken;
   }
+
+  async googleLogin(req) {
+    const { frontendURL } = new ConfigService();
+    if (!req.user) return 'No user from google';
+    const { email: emailAddress, fullName, picture } = req.user;
+
+    // Check whether user not exist, create new user
+    let user = await this.userRepository.findOneBy({ emailAddress });
+    if (!user) {
+      try {
+        user = await this.userRepository.save({
+          fullName,
+          emailAddress,
+          picture,
+        });
+        const emailTilte = '[Media Blog] Welcom! You are signup successfully';
+        await this.emailService.sendSignupMail(
+          emailAddress,
+          emailTilte,
+          frontendURL,
+        );
+      } catch (error) {
+        throw new BadRequestException(error);
+      }
+    }
+
+    // Check whether token of user login exist or not
+    const tokens = this.getTokens(user);
+    const foundAuth = await this.authRepository
+      .createQueryBuilder('auth')
+      .where('auth.userId = :userId', { userId: user.id })
+      .andWhere('auth.refreshToken IS NOT NULL')
+      .getOne();
+    if (!foundAuth) {
+      // Create new token for user
+      await this.authRepository.save({
+        ...tokens,
+        userId: user.id,
+      });
+    } else {
+      // Update exist token for user
+      await this.authRepository.save({
+        ...tokens,
+        id: foundAuth.id,
+      });
+    }
+
+    return {
+      message: 'Sign in user account successfully via google',
+      data: tokens,
+    };
+  }
 }

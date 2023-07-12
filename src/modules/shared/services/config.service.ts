@@ -263,6 +263,14 @@ export class ConfigService {
     return this.envConfig['URL_REACT'] || '';
   }
 
+  get googleClientId(): string {
+    return this.envConfig['GOOGLE_CLIEND_ID'] || '';
+  }
+
+  get googleClientSecret(): string {
+    return this.envConfig['GOOGLE_CLIEND_SECRET'] || '';
+  }
+
   get configJson(): any {
     const entities = [
       path.join(__dirname + '/../../../**/*.entity{.ts,.js}'),

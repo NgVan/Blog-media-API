@@ -11,6 +11,7 @@ import { ConfigService } from '../shared/services/config.service';
 import { EmailService } from '../shared/services/mail.service';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 import { AuthEntity } from './entities/auth.entity';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -27,6 +28,7 @@ import { AuthEntity } from './entities/auth.entity';
     AuthService,
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    GoogleStrategy,
     EmailService,
   ],
 })
