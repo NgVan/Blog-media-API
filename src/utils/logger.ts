@@ -197,7 +197,7 @@ const logLevel: bunyan.LogLevelString = isLogLevel(LOG_LEVEL)
   : 'debug';
 
 export const rootLogger: Logger = bunyan.createLogger({
-  name: 'isomark_api_v1',
+  name: 'media-blog',
   streams: [
     {
       level: 'debug',

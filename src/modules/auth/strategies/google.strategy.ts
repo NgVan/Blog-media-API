@@ -14,7 +14,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: configService.googleClientId,
       clientSecret: configService.googleClientSecret,
-      callbackURL: 'http://localhost:3000/auth/google',
+      callbackURL: 'https://media-blog.onrender.com/auth/google',
+      // callbackURL: 'http://localhost:3000/auth/google',
       scope: ['email', 'profile'],
     });
   }

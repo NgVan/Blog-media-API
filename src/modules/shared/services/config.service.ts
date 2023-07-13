@@ -90,7 +90,7 @@ export class ConfigService {
   }
 
   get apiVersion(): string {
-    return this.envConfig['API_VERSION'] || 'api/v1';
+    return this.envConfig['API_VERSION'] || '';
   }
 
   get appName(): string {

@@ -75,11 +75,13 @@ export class AuthService {
     const { emailAddress, password } = payload;
 
     const user = await this.userRepository.findOneBy({ emailAddress });
-    if (!user)
-      throw new UnauthorizedException('Email or password is incorrect');
+    if (!user) {
+      throw new BadRequestException('Email or password is incorrect');
+    }
     const match = await bcrypt.compare(password, user?.password);
-    if (!match)
-      throw new UnauthorizedException('Email or password is incorrect');
+    if (!match) {
+      throw new BadRequestException('Email or password is incorrect');
+    }
 
     const tokens = this.getTokens(user);
     const foundAuth = await this.authRepository
