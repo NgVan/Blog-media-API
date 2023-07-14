@@ -21,6 +21,7 @@ import { ForgotPasswordDto } from '../dtos/request/forgotPassword.dto';
 import { AuthEntity } from '../entities/auth.entity';
 import { AppRequest } from 'src/utils/app-request';
 import { ResetPasswordDto } from '../dtos/request/resetPassword.dto';
+import { PermissionTypes, RoleTypes } from 'src/utils/enum';
 
 @Injectable()
 export class AuthService {
@@ -53,6 +54,8 @@ export class AuthService {
         sub: user?.id,
         email: user?.emailAddress,
         userName: user?.fullName,
+        role: user?.role,
+        permission: user?.permission,
         iat: Math.round(new Date().getTime() / 1000),
         exp: Math.round(moment(accessTokenExpiredDate).valueOf() / 1000),
       },
@@ -78,6 +81,10 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Email or password is incorrect');
     }
+    if (user.password === null)
+      throw new BadRequestException(
+        'This account is register via google or facebook. Please login with google or facebook',
+      );
     const match = await bcrypt.compare(password, user?.password);
     if (!match) {
       throw new BadRequestException('Email or password is incorrect');
@@ -132,6 +139,8 @@ export class AuthService {
         fullName: userName,
         emailAddress,
         password: hashedPassword,
+        role: RoleTypes.USER,
+        permission: PermissionTypes.COMMENT,
       });
     } catch (error) {
       throw new BadRequestException(error);
@@ -263,7 +272,7 @@ export class AuthService {
     if (!req.user) return 'No user from google';
     const { email: emailAddress, fullName, picture } = req.user;
 
-    // Check whether user not exist, create new user
+    // Check whether user not exist, if not, create new user
     let user = await this.userRepository.findOneBy({ emailAddress });
     if (!user) {
       try {
@@ -271,6 +280,8 @@ export class AuthService {
           fullName,
           emailAddress,
           picture,
+          role: RoleTypes.USER,
+          permission: PermissionTypes.COMMENT,
         });
         const emailTilte = '[Media Blog] Welcom! You are signup successfully';
         await this.emailService.sendSignupMail(

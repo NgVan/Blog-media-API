@@ -1,11 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository, DataSource, Brackets, In } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { get, isEmpty, omit } from 'lodash';
@@ -13,7 +12,6 @@ import { ConfigService } from '../../shared/services/config.service';
 import { RequestContext } from '../../../utils/request-context';
 import { UserDto } from '../dtos/response/user.dto';
 import { UserSignupDto } from '../dtos/request/user-signup.dto';
-import { validatePassword } from 'src/utils/utils';
 import { BaseService } from 'src/database/services/base.service';
 
 @Injectable()
@@ -101,38 +99,29 @@ export class UserService extends BaseService {
     return <UserDto>omit(userDto);
   }
 
-  async changeUserPassword(
-    _context: RequestContext,
-    payload: any,
-    id: string,
-  ): Promise<any> {
-    const { currentPassword, newPassword, newPasswordConfirm } = payload;
-    const user = await this.userRepository.findOneBy({ id });
-    if (!user) throw new NotFoundException('User not found');
-
-    if (user.password !== currentPassword)
-      throw new BadRequestException('Current password is incorrect');
-
-    if (!validatePassword(newPassword))
-      throw new BadRequestException('Invalid Password!');
-
-    if (newPassword !== newPasswordConfirm)
-      throw new BadRequestException(
-        'Confirm password not match with new password',
-      );
-
-    try {
-      await this.userRepository.save({
-        id: user.id,
-        password: newPassword,
-      });
-    } catch (error) {
-      throw new BadRequestException('Change user password fail');
-    }
+  async getCurrentUser(context: RequestContext): Promise<any> {
+    const user = get(context, 'user');
+    const data = await this.userRepository.findOneBy({ id: user.sub });
+    if (!data) throw new NotFoundException('User not found');
     return {
-      status: HttpStatus.OK,
-      message: 'Change user password successful',
+      data: {
+        userName: data.fullName,
+        ...omit(data, [
+          'id',
+          'fullName',
+          'emailVerified',
+          'created',
+          'modified',
+          'deleted',
+          'password',
+        ]),
+      },
+      message: 'Get  current user successfully',
     };
+
+    // const userDto = new UserDto(data);
+
+    // return <UserDto>omit(userDto);
   }
 
   async findUser(emailAddress: string): Promise<any> {

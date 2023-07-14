@@ -24,6 +24,12 @@ export class UserEntity extends AbstractEntity {
   @Column({ type: 'text' })
   picture: string;
 
+  @Column({ type: 'varchar', length: 25 })
+  role: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  permission: string;
+
   // @OneToOne(() => AuthEntity, (auth) => auth.user) // specify inverse side as a second parameter
   // auth: AuthEntity;
 }

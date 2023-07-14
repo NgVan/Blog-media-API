@@ -81,19 +81,6 @@ export class UserController {
     return this.userService.updateUser(request, payload, userId);
   }
 
-  @ApiOperation({ summary: 'Change user password' })
-  @ApiResponse({ status: HttpStatus.OK, description: SUCCESS })
-  @UseGuards(AccessTokenGuard)
-  @HttpCode(HttpStatus.OK)
-  @Patch('change-password/:userId')
-  changeUserPassword(
-    @Req() request: AppRequest,
-    @Param('userId') userId: string,
-    @Body() payload: UserChangePasswordDto,
-  ) {
-    return this.userService.changeUserPassword(request, payload, userId);
-  }
-
   @ApiOperation({ summary: 'Get List User By Filter' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -124,6 +111,15 @@ export class UserController {
     @Param('userId') userId: string,
   ): Promise<UserDto> {
     return this.userService.getUserProfile(request, userId);
+  }
+
+  @ApiOperation({ summary: 'Get Current User' })
+  @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: UserDto })
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Get('currentUser')
+  getCurrentUser(@Req() request: AppRequest): Promise<UserDto> {
+    return this.userService.getCurrentUser(request);
   }
 
   @ApiOperation({ summary: 'Delete One User' })
