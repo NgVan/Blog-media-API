@@ -117,7 +117,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: UserDto })
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  @Get('currentUser')
+  @Get()
   getCurrentUser(@Req() request: AppRequest): Promise<UserDto> {
     return this.userService.getCurrentUser(request);
   }
