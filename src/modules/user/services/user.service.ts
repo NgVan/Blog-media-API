@@ -106,6 +106,7 @@ export class UserService extends BaseService {
     return {
       data: {
         userName: data.fullName,
+        permission: [data.permission],
         ...omit(data, [
           'id',
           'fullName',
@@ -114,6 +115,7 @@ export class UserService extends BaseService {
           'modified',
           'deleted',
           'password',
+          'permission',
         ]),
       },
       message: 'Get  current user successfully',
