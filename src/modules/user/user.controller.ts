@@ -13,28 +13,26 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
-  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
   ApiOperation,
-  ApiConsumes,
-  ApiBody,
   ApiResponse,
 } from '@nestjs/swagger';
-
 import { UserService } from './services/user.service';
-import { LIMIT_SIZE, SUCCESS } from '../../utils/constant';
+import { SUCCESS } from '../../utils/constant';
 import { UserDto } from './dtos/response/user.dto';
 import { AppRequest } from '../../utils/app-request';
-import { UserSignupDto } from './dtos/request/user-signup.dto';
+import { UserCreateDto } from './dtos/request/user-signup.dto';
 import { UserUpdateDto } from './dtos/request/user-update.dto';
-import { UserChangePasswordDto } from './dtos/request/user-change-password.dto';
 import { UserQueryDto } from './dtos/request/user-quey.dto';
 import { UserFilterDto } from './dtos/response/user-filter.dto';
 import { AccessTokenGuard } from '../auth/guards/auth.guard';
 import { UserUpdateProfileDto } from './dtos/request/user-update-profile.dto';
+import { PermissionsGuard } from '../auth/guards/permission.guard';
+import { Permissions } from '../auth/guards/list.decorator';
+import { PermissionTypes } from 'src/utils/enum';
 
 @ApiTags('Users')
 @ApiBearerAuth('access-token')
@@ -49,17 +47,15 @@ export class UserController {
     description: SUCCESS,
     type: UserDto,
   })
-  @UseGuards(AccessTokenGuard)
-  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
-  //   @Permissions(SystemPermissionTypes.ADD_USER)
-  //   @RequiredIn(RequiredInTypes.BODY)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.USER)
   @HttpCode(HttpStatus.CREATED)
   @Post()
   create(
     @Req() request: AppRequest,
-    @Body() payload: UserSignupDto,
+    @Body() payload: UserCreateDto,
   ): Promise<UserDto> {
-    return this.userService.signup(request, payload);
+    return this.userService.createUser(request, payload);
   }
 
   @ApiOperation({ summary: 'Update User' })
@@ -68,10 +64,8 @@ export class UserController {
     description: SUCCESS,
     type: UserDto,
   })
-  @UseGuards(AccessTokenGuard)
-  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
-  //   @Permissions(SystemPermissionTypes.ADD_USER)
-  //   @RequiredIn(RequiredInTypes.BODY)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.USER)
   @HttpCode(HttpStatus.OK)
   @Put(':userId')
   update(
@@ -88,23 +82,21 @@ export class UserController {
     description: SUCCESS,
     type: UserFilterDto,
   })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.USER)
   @HttpCode(HttpStatus.OK)
   @Get('Filter')
   getList(
     @Req() request: AppRequest,
     @Query() filter: UserQueryDto,
   ): Promise<UserFilterDto> {
-    return this.userService.getListByFilter(filter);
+    return this.userService.getListUserByFilter(filter);
   }
 
   @ApiOperation({ summary: 'Get One User' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: UserDto })
-  @UseGuards(AccessTokenGuard)
-  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
-  //   @IsSelf(true)
-  //   @Permissions(SystemPermissionTypes.VIEW_DETAIL_USER)
-  //   @RequiredIn(RequiredInTypes.PARAMS)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.USER)
   @HttpCode(HttpStatus.OK)
   @Get(':userId')
   getUserProfile(
@@ -126,9 +118,6 @@ export class UserController {
   @ApiOperation({ summary: 'Update Profile' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: UserDto })
   @UseGuards(AccessTokenGuard)
-  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
-  //   @Permissions(SystemPermissionTypes.ADD_USER)
-  //   @RequiredIn(RequiredInTypes.BODY)
   @HttpCode(HttpStatus.OK)
   @Put()
   updateProfile(
@@ -141,12 +130,10 @@ export class UserController {
   @ApiOperation({ summary: 'Delete One User' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: Boolean })
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AccessTokenGuard)
-  //   @Permissions(SystemPermissionTypes.DELETE_LOCATION)
-  //   @RequiredIn(RequiredInTypes.PARAMS)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.USER)
   @Delete(':userId')
-  delete(@Param('userId') id: string): Promise<boolean> {
+  delete(@Param('userId') id: string): Promise<any> {
     return this.userService.softDelete(id);
   }
 }
-//f0611acf-1920-4283-aaad-965c315fc331

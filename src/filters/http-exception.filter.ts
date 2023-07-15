@@ -33,10 +33,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         },
       ],
     };
-    if (status === HttpStatus.NOT_FOUND) {
-      response.status(status).json();
-    } else {
-      response.status(status).json(responseBody);
-    }
+    // if (status === HttpStatus.NOT_FOUND) {
+    //   response.status(status).json();
+    // } else {
+    //   response.status(status).json(responseBody);
+    // }
+    response.status(status).json(responseBody);
   }
 }

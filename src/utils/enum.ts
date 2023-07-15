@@ -9,6 +9,7 @@ export enum PermissionTypes {
   COMMENT = 'COMMENT',
   POST = 'POST',
   PRODUCT = 'PRODUCT',
+  USER = 'USER',
 }
 
 export enum SystemRoleLevel {

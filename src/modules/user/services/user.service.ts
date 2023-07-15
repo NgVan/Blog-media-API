@@ -11,9 +11,13 @@ import { get, isEmpty, omit } from 'lodash';
 import { ConfigService } from '../../shared/services/config.service';
 import { RequestContext } from '../../../utils/request-context';
 import { UserDto } from '../dtos/response/user.dto';
-import { UserSignupDto } from '../dtos/request/user-signup.dto';
+import { UserCreateDto } from '../dtos/request/user-signup.dto';
 import { BaseService } from 'src/database/services/base.service';
 import { UserUpdateProfileDto } from '../dtos/request/user-update-profile.dto';
+import { AbstractFilterDto } from 'src/database/dtos/abstract-filter.dto';
+import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
+import * as bcrypt from 'bcrypt';
+import { PermissionTypes, RoleTypes } from 'src/utils/enum';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -22,60 +26,52 @@ export class UserService extends BaseService {
 
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-    // @InjectRepository(RoleEntity)
-    // private roleRepository: Repository<RoleEntity>,
-
-    // private imageService: ImageService,
-    // private auth0Service: Auth0Service,
-    // private userVerificationService: UserVerificationService,
-    // private userRoleService: UserRoleService,
-    // private userOrganizationService: UserOrganizationService,
-    // private organizationService: OrganizationService,
-
-    // private emailService: EmailService,
     private configService: ConfigService,
   ) {
     super(userRepository, 'User');
   }
 
-  async signup(context: RequestContext, payload: UserSignupDto): Promise<any> {
-    const { emailAddress } = payload;
-
-    // const requestOrganizationId = get(context, 'user.currentUser.organizations[0].organizationId', null);
-
-    // if (requestOrganizationId && !organizationId) {
-    //   throw new BadRequestException('organizationId is required');
-    // }
-    // if (!isEmpty(roleIds)) {
-    //   const roles = await this.roleRepository.findBy({ id: In(roleIds) });
-    //   if (roles.find((r) => r.level === SystemRoleLevel.ORGANIZATION_ADMIN) && !organizationId) {
-    //     throw new BadRequestException('organizationId is required');
-    //   }
-    // }
-
+  async createUser(
+    context: RequestContext,
+    payload: UserCreateDto,
+  ): Promise<any> {
+    const { emailAddress, password, permissions } = payload;
+    console.log({ password, permissions });
+    permissions.push(PermissionTypes.COMMENT);
     const checkExistedUser = await this.userRepository.findOneBy({
       emailAddress,
     });
     if (checkExistedUser)
       throw new ConflictException('User has already conflicted');
 
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
     let user: any;
     try {
       // Create user in DB
       user = await this.userRepository.save({
-        ...payload,
+        ...omit(payload, ['password', 'permissions']),
+        password: hashedPassword,
+        role: RoleTypes.USER,
+        permission: permissions.join('-'),
       });
     } catch (error) {
       throw new BadRequestException(error);
     }
-    return await this.getUserProfile(context, user.id);
+    return {
+      data: await this.getUserProfile(context, user.id),
+      message: 'Create user successfully',
+    };
   }
 
   async updateUser(
     context: RequestContext,
     payload: any,
     id: string,
-  ): Promise<UserDto> {
+  ): Promise<any> {
+    const { permissions } = payload;
+    permissions.push(PermissionTypes.COMMENT);
+
     const user = await this.userRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('User not found');
     if (isEmpty(payload)) throw new BadRequestException('Body is required');
@@ -83,13 +79,38 @@ export class UserService extends BaseService {
     try {
       await this.userRepository.save({
         id: user.id,
-        ...omit(payload, ['password', 'emailAddress']),
+        ...omit(payload, 'permissions'),
+        permission: permissions.join('-'),
       });
     } catch (error) {
       throw new BadRequestException('Update user fail');
     }
 
-    return this.getUserProfile(context, user.id);
+    return {
+      data: await this.getUserProfile(context, user.id),
+      message: 'Update user successfully',
+    };
+  }
+
+  async getListUserByFilter(filterParam: AbstractFilterDto): Promise<any> {
+    const {
+      page = DEFAULT_VALUE_FILTER.PAGE,
+      limit = DEFAULT_VALUE_FILTER.LIMIT,
+    } = filterParam;
+    const totalSkip = (page - 1) * limit;
+
+    const [result, total] = await this.userRepository.findAndCount({
+      take: limit,
+      skip: totalSkip,
+      // withDeleted: withDeleted?.toString() === 'true',
+    });
+    const res = result.map((user) => new UserDto(user));
+    console.log({ result, total });
+
+    return {
+      entities: res,
+      totalEntities: total,
+    };
   }
 
   async getUserProfile(_context: RequestContext, id: string): Promise<UserDto> {
@@ -115,7 +136,7 @@ export class UserService extends BaseService {
           'password',
           'permission',
         ]),
-        permission: data.permission.split('-'),
+        permissions: data.permission.split('-'),
       },
       message: 'Get current user successfully',
     };
@@ -155,7 +176,7 @@ export class UserService extends BaseService {
           'password',
           'permission',
         ]),
-        permission: foundUser.permission.split('-'),
+        permissions: foundUser.permission.split('-'),
       },
       message: 'Update current user successfully',
     };

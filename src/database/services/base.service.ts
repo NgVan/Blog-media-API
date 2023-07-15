@@ -31,7 +31,7 @@ export class BaseService {
       page = DEFAULT_VALUE_FILTER.PAGE,
       limit = DEFAULT_VALUE_FILTER.LIMIT,
     } = filterParam;
-    const totalSkip = page * limit;
+    const totalSkip = (page - 1) * limit;
 
     const [result, total] = await this.baseRepository.findAndCount({
       take: limit,
@@ -64,11 +64,13 @@ export class BaseService {
     return affected !== 0;
   }
 
-  async softDelete(id: string): Promise<boolean> {
+  async softDelete(id: string): Promise<any> {
     const data = await this.baseRepository.findOneBy({ id });
     if (!data) throw new NotFoundException(`${this.controllerName} not found`);
     const { affected } = await this.baseRepository.softDelete(id);
-    return affected === 1;
+    return {
+      message: `Delete ${this.controllerName} successfully`,
+    };
   }
 
   async softRemove(id: string, databaseName: string): Promise<boolean> {

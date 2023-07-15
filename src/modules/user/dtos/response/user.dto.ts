@@ -11,20 +11,33 @@ export class UserDto extends AbstractDto {
     super(userEntity);
     this.userName = userEntity?.userName;
     this.emailAddress = userEntity?.emailAddress;
-    this.emailVerified = userEntity?.emailVerified;
+    // this.emailVerified = userEntity?.emailVerified;
     this.phoneNumber = userEntity?.phoneNumber;
+    this.picture = userEntity?.picture;
+    this.role = userEntity?.role;
+    this.permissions = userEntity?.permission
+      ? userEntity.permission.split('-')
+      : [];
   }
 
-  @ApiProperty({ required: false })
   @ApiProperty({ required: false })
   userName: string;
 
   @ApiProperty({ required: false })
   emailAddress: string;
 
-  @ApiProperty({ required: false })
-  emailVerified: boolean;
+  // @ApiProperty({ required: false })
+  // emailVerified: boolean;
 
   @ApiProperty({ required: false })
   phoneNumber: string;
+
+  @ApiProperty({ required: false })
+  picture: string;
+
+  @ApiProperty({ required: false })
+  role: string;
+
+  @ApiProperty({ required: false })
+  permissions: string[];
 }

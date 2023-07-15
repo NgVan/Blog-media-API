@@ -5,9 +5,11 @@ import {
   IsBoolean,
   Length,
   IsNotEmpty,
+  IsOptional,
+  IsArray,
 } from 'class-validator';
 
-export class UserSignupDto {
+export class UserCreateDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -16,42 +18,23 @@ export class UserSignupDto {
 
   @ApiProperty()
   @IsEmail()
+  @IsNotEmpty()
   emailAddress: string;
 
   @ApiProperty()
-  @IsBoolean()
-  emailVerified: boolean;
-
-  @ApiProperty()
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @Length(1, 20)
   phoneNumber: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @Length(1, 100)
+  @Length(1, 20)
   password: string;
 
-  // @ApiProperty()
-  // @IsNotEmpty()
-  // @IsArray()
-  // @IsString({ each: true })
-  // @IsNotEmpty({ each: true })
-  // @ArrayMinSize(1)
-  // @Validate(CustomDuplicateRole, { message: 'Duplicate roleId!' })
-  // roleIds: string[];
-
-  // @ApiProperty()
-  // @IsOptional()
-  // @IsString()
-  // @IsNotEmpty()
-  // organizationId: string;
-
-  // @ApiProperty()
-  // @IsOptional()
-  // @IsString()
-  // @IsNotEmpty()
-  // positionId: string;
+  @ApiProperty()
+  @IsArray()
+  @IsNotEmpty()
+  permissions: string[];
 }
