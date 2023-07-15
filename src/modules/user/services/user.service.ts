@@ -18,6 +18,7 @@ import { AbstractFilterDto } from 'src/database/dtos/abstract-filter.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import * as bcrypt from 'bcrypt';
 import { PermissionTypes, RoleTypes } from 'src/utils/enum';
+import { AuthEntity } from 'src/modules/auth/entities/auth.entity';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -26,6 +27,8 @@ export class UserService extends BaseService {
 
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(AuthEntity)
+    private authRepository: Repository<AuthEntity>,
     private configService: ConfigService,
   ) {
     super(userRepository, 'User');
@@ -70,7 +73,7 @@ export class UserService extends BaseService {
     id: string,
   ): Promise<any> {
     const { permissions } = payload;
-    permissions.push(PermissionTypes.COMMENT);
+    if (permissions) permissions.push(PermissionTypes.COMMENT);
 
     const user = await this.userRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('User not found');
@@ -80,7 +83,7 @@ export class UserService extends BaseService {
       await this.userRepository.save({
         id: user.id,
         ...omit(payload, 'permissions'),
-        permission: permissions.join('-'),
+        permission: permissions ? permissions.join('-') : user?.permission,
       });
     } catch (error) {
       throw new BadRequestException('Update user fail');
@@ -185,5 +188,15 @@ export class UserService extends BaseService {
   async findUser(emailAddress: string): Promise<any> {
     const user = await this.userRepository.findOneBy({ emailAddress });
     return user;
+  }
+
+  async softDelete(id: string): Promise<any> {
+    const data = await this.userRepository.findOneBy({ id });
+    if (!data) throw new NotFoundException(`User not found`);
+    await this.userRepository.softDelete(id);
+    await this.authRepository.delete({ userId: id });
+    return {
+      message: `Delete user successfully`,
+    };
   }
 }
