@@ -7,7 +7,7 @@ export const USER_TABLE = 'user';
 @Entity(USER_TABLE)
 export class UserEntity extends AbstractEntity {
   @Column({ type: 'varchar', length: 100 })
-  fullName: string;
+  userName: string;
 
   @Column({ type: 'varchar', length: 100, unique: true })
   emailAddress: string;

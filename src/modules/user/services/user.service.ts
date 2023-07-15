@@ -13,6 +13,7 @@ import { RequestContext } from '../../../utils/request-context';
 import { UserDto } from '../dtos/response/user.dto';
 import { UserSignupDto } from '../dtos/request/user-signup.dto';
 import { BaseService } from 'src/database/services/base.service';
+import { UserUpdateProfileDto } from '../dtos/request/user-update-profile.dto';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -105,11 +106,8 @@ export class UserService extends BaseService {
     if (!data) throw new NotFoundException('User not found');
     return {
       data: {
-        userName: data.fullName,
-        permission: [data.permission],
         ...omit(data, [
           'id',
-          'fullName',
           'emailVerified',
           'created',
           'modified',
@@ -117,13 +115,50 @@ export class UserService extends BaseService {
           'password',
           'permission',
         ]),
+        permission: data.permission.split('-'),
       },
-      message: 'Get  current user successfully',
+      message: 'Get current user successfully',
     };
 
     // const userDto = new UserDto(data);
 
     // return <UserDto>omit(userDto);
+  }
+
+  async updateProfile(
+    context: RequestContext,
+    payload: UserUpdateProfileDto,
+  ): Promise<any> {
+    const { userName, phoneNumber, picture } = payload;
+    const user = get(context, 'user');
+    const data = await this.userRepository.findOneBy({ id: user.sub });
+    if (!data) throw new NotFoundException('User not found');
+    try {
+      await this.userRepository.save({
+        id: data.id,
+        userName,
+        phoneNumber,
+        picture,
+      });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+    const foundUser = await this.userRepository.findOneBy({ id: data.id });
+    return {
+      data: {
+        ...omit(foundUser, [
+          'id',
+          'emailVerified',
+          'created',
+          'modified',
+          'deleted',
+          'password',
+          'permission',
+        ]),
+        permission: foundUser.permission.split('-'),
+      },
+      message: 'Update current user successfully',
+    };
   }
 
   async findUser(emailAddress: string): Promise<any> {

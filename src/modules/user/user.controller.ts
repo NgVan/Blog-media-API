@@ -34,6 +34,7 @@ import { UserChangePasswordDto } from './dtos/request/user-change-password.dto';
 import { UserQueryDto } from './dtos/request/user-quey.dto';
 import { UserFilterDto } from './dtos/response/user-filter.dto';
 import { AccessTokenGuard } from '../auth/guards/auth.guard';
+import { UserUpdateProfileDto } from './dtos/request/user-update-profile.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth('access-token')
@@ -120,6 +121,21 @@ export class UserController {
   @Get()
   getCurrentUser(@Req() request: AppRequest): Promise<UserDto> {
     return this.userService.getCurrentUser(request);
+  }
+
+  @ApiOperation({ summary: 'Update Profile' })
+  @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: UserDto })
+  @UseGuards(AccessTokenGuard)
+  //   @UseGuards(AccessTokenGuard, PermissionsGuard)
+  //   @Permissions(SystemPermissionTypes.ADD_USER)
+  //   @RequiredIn(RequiredInTypes.BODY)
+  @HttpCode(HttpStatus.OK)
+  @Put()
+  updateProfile(
+    @Req() request: AppRequest,
+    @Body() payload: UserUpdateProfileDto,
+  ): Promise<UserDto> {
+    return this.userService.updateProfile(request, payload);
   }
 
   @ApiOperation({ summary: 'Delete One User' })

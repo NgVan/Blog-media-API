@@ -9,7 +9,7 @@ import { UserEntity } from '../../entities/user.entity';
 export class UserDto extends AbstractDto {
   constructor(userEntity: UserEntity = <UserEntity>{}) {
     super(userEntity);
-    this.fullName = userEntity?.fullName;
+    this.userName = userEntity?.userName;
     this.emailAddress = userEntity?.emailAddress;
     this.emailVerified = userEntity?.emailVerified;
     this.phoneNumber = userEntity?.phoneNumber;
@@ -17,7 +17,7 @@ export class UserDto extends AbstractDto {
 
   @ApiProperty({ required: false })
   @ApiProperty({ required: false })
-  fullName: string;
+  userName: string;
 
   @ApiProperty({ required: false })
   emailAddress: string;

@@ -1,7 +1,8 @@
+/* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, Length } from 'class-validator';
 
-export class UserUpdateDto {
+export class UserUpdateProfileDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
@@ -13,4 +14,9 @@ export class UserUpdateDto {
   @IsOptional()
   @Length(1, 20)
   phoneNumber: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  picture: string;
 }

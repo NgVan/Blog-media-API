@@ -3,21 +3,16 @@ import {
   IsEmail,
   IsString,
   IsBoolean,
-  IsOptional,
   Length,
   IsNotEmpty,
-  IsArray,
-  ArrayMinSize,
-  Validate,
 } from 'class-validator';
-// import { CustomDuplicateRole } from './CustomDuplicateRole';
 
 export class UserSignupDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @Length(1, 100)
-  fullName: string;
+  userName: string;
 
   @ApiProperty()
   @IsEmail()

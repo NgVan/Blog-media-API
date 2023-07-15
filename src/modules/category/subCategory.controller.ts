@@ -24,6 +24,9 @@ import { SubCategoryDto } from './dtos/response/subCat.dto';
 import { SubCatCreateDto } from './dtos/request/subCat-create.dto';
 import { SubCatUpdateDto } from './dtos/request/subCat-update.dto';
 import { SubCatFilterDto } from './dtos/response/subcat-filter.dto';
+import { PermissionTypes } from 'src/utils/enum';
+import { PermissionsGuard } from '../auth/guards/permission.guard';
+import { Permissions } from '../auth/guards/list.decorator';
 
 @ApiTags('SubCategories')
 @Controller('subcategory')
@@ -33,7 +36,8 @@ export class SubCategoryController {
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create Sub-Category' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS,
@@ -45,7 +49,8 @@ export class SubCategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update Sub-Category' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
@@ -88,7 +93,8 @@ export class SubCategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete Sub-Category' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,

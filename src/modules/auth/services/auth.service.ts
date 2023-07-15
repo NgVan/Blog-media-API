@@ -53,9 +53,9 @@ export class AuthService {
       {
         sub: user?.id,
         email: user?.emailAddress,
-        userName: user?.fullName,
+        userName: user?.userName,
         role: user?.role,
-        permission: user?.permission,
+        permission: user?.permission.split('-'),
         iat: Math.round(new Date().getTime() / 1000),
         exp: Math.round(moment(accessTokenExpiredDate).valueOf() / 1000),
       },
@@ -65,7 +65,7 @@ export class AuthService {
       {
         sub: user?.id,
         email: user?.emailAddress,
-        userName: user?.fullName,
+        userName: user?.userName,
         iat: Math.round(new Date().getTime() / 1000),
         exp: Math.round(moment(refreshTokenExpiredDate).valueOf() / 1000),
       },
@@ -136,7 +136,7 @@ export class AuthService {
     try {
       // Create user in DB
       user = await this.userRepository.save({
-        fullName: userName,
+        userName,
         emailAddress,
         password: hashedPassword,
         role: RoleTypes.USER,
@@ -270,14 +270,14 @@ export class AuthService {
   async googleLogin(req) {
     const { frontendURL } = new ConfigService();
     if (!req.user) return 'No user from google';
-    const { email: emailAddress, fullName, picture } = req.user;
+    const { email: emailAddress, userName, picture } = req.user;
 
     // Check whether user not exist, if not, create new user
     let user = await this.userRepository.findOneBy({ emailAddress });
     if (!user) {
       try {
         user = await this.userRepository.save({
-          fullName,
+          userName,
           emailAddress,
           picture,
           role: RoleTypes.USER,

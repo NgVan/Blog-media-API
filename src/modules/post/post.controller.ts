@@ -24,6 +24,9 @@ import { PostDto } from './dtos/response/post.dto';
 import { PostUpdateDto } from './dtos/request/post-update.dto';
 import { AbstractFilterDto } from 'src/database/dtos/abstract-filter.dto';
 import { PostFilterDto } from './dtos/response/post-filter.dto';
+import { PermissionsGuard } from '../auth/guards/permission.guard';
+import { Permissions } from '../auth/guards/list.decorator';
+import { PermissionTypes } from 'src/utils/enum';
 
 @ApiTags('Posts')
 @Controller('post')
@@ -33,7 +36,8 @@ export class PostController {
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create Post' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS,
@@ -48,7 +52,8 @@ export class PostController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update Post' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
@@ -91,7 +96,8 @@ export class PostController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete post' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,

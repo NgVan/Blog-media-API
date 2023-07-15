@@ -24,6 +24,9 @@ import { AppRequest } from 'src/utils/app-request';
 import { CategoryDto } from './dtos/response/cat.dto';
 import { CatQueryDto } from './dtos/request/CatQuery.dto';
 import { CatFilterDto } from './dtos/response/cat-filter.dto';
+import { PermissionTypes } from 'src/utils/enum';
+import { Permissions } from '../auth/guards/list.decorator';
+import { PermissionsGuard } from '../auth/guards/permission.guard';
 
 @ApiTags('Categories')
 @Controller('category')
@@ -33,7 +36,8 @@ export class CategoryController {
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create Category' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS,
@@ -45,7 +49,8 @@ export class CategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update Category' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
@@ -88,7 +93,8 @@ export class CategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete Category' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.POST)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
