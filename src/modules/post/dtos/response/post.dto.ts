@@ -9,6 +9,7 @@ export class PostDto extends AbstractDto {
     super(postEntity);
     this.title = postEntity.title;
     this.author = postEntity.author;
+    this.subCategoryId = postEntity.subCategoryId;
     this.contents = postEntity.contents;
   }
   @ApiProperty({ required: false })
@@ -16,6 +17,9 @@ export class PostDto extends AbstractDto {
 
   @ApiProperty({ required: false })
   author: string;
+
+  @ApiProperty({ required: false })
+  subCategoryId: string;
 
   @ApiProperty({ required: false })
   subCategory: SubCategoryEntity;

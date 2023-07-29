@@ -5,6 +5,6 @@ export class CreateCatDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @Length(1, 45)
+  @Length(1, 20)
   name: string;
 }
