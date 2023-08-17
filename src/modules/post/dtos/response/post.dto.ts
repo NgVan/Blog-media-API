@@ -3,6 +3,7 @@ import { AbstractDto } from 'src/database/dtos/abstract.dto';
 import { PostEntity } from '../../entities/post.entity';
 import { SubCategoryEntity } from 'src/modules/category/entities/subCategory.entity';
 import { ContentEntity } from '../../entities/content.entity';
+import { CommentEntity } from '../../../comment/entities/comment.entity';
 
 export class PostDto extends AbstractDto {
   constructor(postEntity: PostEntity = <PostEntity>{}) {
@@ -11,6 +12,7 @@ export class PostDto extends AbstractDto {
     this.author = postEntity.author;
     this.subCategoryId = postEntity.subCategoryId;
     this.contents = postEntity.contents;
+    this.comments = postEntity.comments;
   }
   @ApiProperty({ required: false })
   title: string;
@@ -26,4 +28,7 @@ export class PostDto extends AbstractDto {
 
   @ApiProperty({ required: false })
   contents: ContentEntity[];
+
+  @ApiProperty({ required: false })
+  comments: CommentEntity[];
 }

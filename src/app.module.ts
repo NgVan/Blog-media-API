@@ -14,6 +14,7 @@ import { PostModule } from './modules/post/post.module';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { CommentModule } from './modules/comment/comment.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { HttpExceptionFilter } from './filters/http-exception.filter';
     AuthModule,
     CategoryModule,
     PostModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [

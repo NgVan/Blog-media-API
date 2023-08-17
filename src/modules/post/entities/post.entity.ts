@@ -3,6 +3,7 @@ import { AbstractEntity } from '../../../database/entities/abstract.entity';
 import { ContentEntity } from './content.entity';
 import { SubCategoryEntity } from 'src/modules/category/entities/subCategory.entity';
 import { PostDto } from '../dtos/response/post.dto';
+import { CommentEntity } from '../../comment/entities/comment.entity';
 
 export const POST_TABLE = 'post';
 
@@ -23,6 +24,13 @@ export class PostEntity extends AbstractEntity {
   })
   // @JoinColumn()
   contents: ContentEntity[];
+
+  @OneToMany(() => CommentEntity, (comment: any) => comment.post, {
+    eager: true,
+    cascade: true,
+  })
+  // @JoinColumn()
+  comments: CommentEntity[];
 
   @ManyToOne(() => SubCategoryEntity, (subCate) => subCate.posts)
   subCategory: SubCategoryEntity;

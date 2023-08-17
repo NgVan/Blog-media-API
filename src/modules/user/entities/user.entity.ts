@@ -1,6 +1,7 @@
 // import { UserRoleEntity } from './user-role.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../../database/entities/abstract.entity';
+import { CommentEntity } from '../../comment/entities/comment.entity';
 
 export const USER_TABLE = 'user';
 
@@ -30,6 +31,12 @@ export class UserEntity extends AbstractEntity {
   @Column({ type: 'varchar', length: 255 })
   permission: string;
 
+  @OneToMany(() => CommentEntity, (comment: any) => comment.user, {
+    eager: true,
+    cascade: true,
+  })
+  // @JoinColumn()
+  comments: CommentEntity[];
   // @OneToOne(() => AuthEntity, (auth) => auth.user) // specify inverse side as a second parameter
   // auth: AuthEntity;
 }
