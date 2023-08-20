@@ -132,9 +132,17 @@ export class PostService extends BaseService {
   }
 
   async getOne(id: string): Promise<PostDto> {
-    const foundPost = await this.postRepository.findOneBy({ id });
-    if (!foundPost) throw new NotFoundException('Not found post');
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.comments', 'c')
+      .leftJoinAndSelect('post.contents', 'ct')
+      .leftJoin('c.user', 'u')
+      .where('post.id = :id', { id })
+      // .orderBy('c.created', 'ASC');
+      .addSelect(['u.userName']);
 
+    const foundPost = await query.getOne();
+    if (!foundPost) throw new NotFoundException('Not found post');
     // const post = new PostDto(foundPost);
     // return post;
     return foundPost.toDto();

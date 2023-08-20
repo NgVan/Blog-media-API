@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Column, Entity, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { AbstractEntity } from '../../../database/entities/abstract.entity';
 import { ContentEntity } from './content.entity';
@@ -40,6 +41,10 @@ export class PostEntity extends AbstractEntity {
     dto.contents = this.contents.sort(
       (a, b) => a.displayOrder - b.displayOrder,
     ); // Sắp xếp theo displayOrder
+
+    dto.comments = this.comments.sort(
+      (a, b) => b.created.getTime() - a.created.getTime(),
+    );
     return dto;
   }
 }

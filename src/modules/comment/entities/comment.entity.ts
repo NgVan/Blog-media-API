@@ -19,9 +19,6 @@ export class CommentEntity extends AbstractEntity {
   @Column({ type: 'varchar', length: 36 })
   userId: string;
 
-  @Column({ type: 'timestamp' })
-  creationDate: Date;
-
   @ManyToOne(() => PostEntity, (post) => post.comments)
   @JoinColumn()
   post: PostEntity;
