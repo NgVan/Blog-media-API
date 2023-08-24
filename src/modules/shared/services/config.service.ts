@@ -271,6 +271,14 @@ export class ConfigService {
     return this.envConfig['GOOGLE_CLIEND_SECRET'] || '';
   }
 
+  get facebookClientId(): string {
+    return this.envConfig['FACEBOOK_CLIEND_ID'] || '';
+  }
+
+  get facebookClientSecret(): string {
+    return this.envConfig['FACEBOOK_CLIEND_SECRET'] || '';
+  }
+
   get configJson(): any {
     const entities = [
       path.join(__dirname + '/../../../**/*.entity{.ts,.js}'),

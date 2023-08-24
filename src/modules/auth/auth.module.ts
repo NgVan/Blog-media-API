@@ -12,6 +12,7 @@ import { EmailService } from '../shared/services/mail.service';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 import { AuthEntity } from './entities/auth.entity';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { FacebookStrategy } from './strategies/facebook.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -29,6 +30,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
     AccessTokenStrategy,
     RefreshTokenStrategy,
     GoogleStrategy,
+    FacebookStrategy,
     EmailService,
   ],
 })

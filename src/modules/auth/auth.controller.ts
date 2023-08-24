@@ -96,4 +96,20 @@ export class AuthController {
   googleAuthRedirect(@Req() req) {
     return this.authService.googleLogin(req);
   }
+
+  @Get('faceboo')
+  @UseGuards(AuthGuard('facebook'))
+  async facebookLogin(): Promise<any> {
+    return HttpStatus.OK;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Signin via facebook' })
+  @Get('facebook')
+  @UseGuards(AuthGuard('facebook'))
+  facebookLoginRedirect(@Req() req: Request) {
+    console.log('ADDD');
+
+    this.authService.facebookLogin(req);
+  }
 }
