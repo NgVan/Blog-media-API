@@ -107,7 +107,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Signin via facebook' })
   @Get('facebook')
   @UseGuards(AuthGuard('facebook'))
-  facebookLoginRedirect(@Req() req: Request) {
+  facebookLoginRedirect(@Req() req) {
     console.log('ADDD');
 
     this.authService.facebookLogin(req);
