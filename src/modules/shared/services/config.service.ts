@@ -255,8 +255,28 @@ export class ConfigService {
     return this.envConfig['GMAIL_USER'] || '';
   }
 
+  get rootEmailPass(): string {
+    return this.envConfig['GMAIL_PASSWORD'] || '';
+  }
+
   get rootEmailAppPass(): string {
     return this.envConfig['APP_PASSWORD'] || '';
+  }
+
+  get mailHost(): string {
+    return this.envConfig['MAIL_HOST'] || '';
+  }
+
+  get mailUser(): string {
+    return this.envConfig['MAIL_USER'] || '';
+  }
+
+  get mailPassword(): string {
+    return this.envConfig['MAIL_PASSWORD'] || '';
+  }
+
+  get mailFrom(): string {
+    return this.envConfig['MAIL_FROM'] || '';
   }
 
   get frontendURL(): string {

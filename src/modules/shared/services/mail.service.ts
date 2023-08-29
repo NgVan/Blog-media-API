@@ -84,7 +84,9 @@ export class EmailService {
     return await transporter.sendMail(mailOptions);
   }
 
-  async sendResetMail(to: string, subject: string, url: string) {
+  async sendRegisterMail(to: string, subject: string, url: string) {
+    console.log({ to, subject, url });
+
     const { rootEmail, rootEmailAppPass } = new ConfigService();
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -105,7 +107,7 @@ export class EmailService {
                 <h2> Welcome to Media Blog." </h2>
                 <p>
                     Congratulations! You're almost set to start with Media Blog.
-                    Just click the button below to go to the Media Blog.
+                    Just click the button below to go to the register of Media Blog.
                 </p>
                 <a href=${url} style="background: crimson; text-decoration: none; color: white; padding: 10px 20px; margin: 10px 0; display: inline-block;"> 
                     Media Dashboard
@@ -119,7 +121,7 @@ export class EmailService {
             </div>
         `,
     };
-
+    console.log('ddddddddddd');
     return await transporter.sendMail(mailOptions);
   }
 }

@@ -21,6 +21,7 @@ import { AppRequest } from 'src/utils/app-request';
 import { AccessTokenGuard } from './guards/auth.guard';
 import { ResetPasswordDto } from './dtos/request/resetPassword.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { RegisterDto } from './dtos/request/register.dto';
 @ApiTags('Auths')
 @Controller('auth')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -36,6 +37,17 @@ export class AuthController {
   @Post('login')
   signIn(@Body() payload: SignInDto) {
     return this.authService.signIn(payload);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Register' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: SUCCESS,
+  })
+  @Post('register')
+  register(@Body() payload: RegisterDto) {
+    return this.authService.register(payload);
   }
 
   @HttpCode(HttpStatus.OK)

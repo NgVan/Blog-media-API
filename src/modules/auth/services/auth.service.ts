@@ -1,10 +1,10 @@
+/* eslint-disable prettier/prettier */
 import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { sign } from 'jsonwebtoken';
 import * as moment from 'moment';
@@ -15,13 +15,15 @@ import { SignUpDto } from '../dtos/request/signup.dto';
 import { validatePassword } from 'src/utils/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
-import { IsNull, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { EmailService } from '../../shared/services/mail.service';
 import { ForgotPasswordDto } from '../dtos/request/forgotPassword.dto';
 import { AuthEntity } from '../entities/auth.entity';
 import { AppRequest } from 'src/utils/app-request';
 import { ResetPasswordDto } from '../dtos/request/resetPassword.dto';
 import { PermissionTypes, RoleTypes } from 'src/utils/enum';
+import { RegisterDto } from '../dtos/request/register.dto';
+import { MailerService } from '@nest-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -31,6 +33,7 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private emailService: EmailService,
+    private mailerService: MailerService,
   ) {}
 
   getTokens(user) {
@@ -118,6 +121,32 @@ export class AuthService {
     };
   }
 
+  async register(payload: RegisterDto): Promise<any> {
+    const { frontendURL } = new ConfigService();
+    const { emailAddress } = payload;
+    const foundUser = await this.userRepository.findOneBy({
+      emailAddress,
+    });
+    if (foundUser) throw new ConflictException('User already exist in system');
+
+    // const url = `${frontendURL}/signup`;
+    // const emailTilte = 'Register new account';
+    // await this.emailService.sendRegisterMail(emailAddress, emailTilte, url);
+
+    await this.mailerService.sendMail({
+      to: emailAddress,
+      subject: 'Register new account',
+      template: './template',
+      context: {
+        url: `${frontendURL}/signup`,
+        action: 'go to the register of Media Blog',
+      },
+    });
+    return {
+      message: 'Sign up link is sent to your email. Please check your email',
+    };
+  }
+
   async signUp(payload: SignUpDto): Promise<any> {
     const { frontendURL } = new ConfigService();
     const { userName, emailAddress, password, passwordConfirm } = payload;
@@ -150,10 +179,18 @@ export class AuthService {
     await this.authRepository.save({ ...tokens, userId: user.id });
 
     // Send mail to inform user that signup is successful
-    const url = frontendURL; // URL: should send Dashboard
-    const emailTilte = '[Media Blog] Welcom! You are signup successfully';
-    await this.emailService.sendSignupMail(emailAddress, emailTilte, url);
-
+    // const url = frontendURL; // URL: should send Dashboard
+    // const emailTilte = 'Welcom! You are signup successfully';
+    // await this.emailService.sendSignupMail(emailAddress, emailTilte, url);
+    await this.mailerService.sendMail({
+      to: emailAddress,
+      subject: 'Welcom! You are signup successfully',
+      template: './template',
+      context: {
+        url: frontendURL,
+        action: 'go to the Media Blog',
+      },
+    });
     return {
       data: tokens,
       message: 'Sign up user account successfully',
@@ -195,8 +232,18 @@ export class AuthService {
     // url : là trỏ đến đường dẫn của Frontend
     const url = `${frontendURL}/reset-password/${tokens.accessToken}`;
 
-    const emailTilte = 'Reset your password';
-    await this.emailService.sendMail(emailAddress, emailTilte, url);
+    // const emailTilte = 'Reset your password';
+    // await this.emailService.sendMail(emailAddress, emailTilte, url);
+
+    await this.mailerService.sendMail({
+      to: emailAddress,
+      subject: 'Reset your password',
+      template: './template',
+      context: {
+        url: url,
+        action: 'reset your account password',
+      },
+    });
     return {
       message:
         'Forgot password link sent to your email with time duration is 2 hours. Please check your email',
@@ -238,9 +285,19 @@ export class AuthService {
 
     // Send mail to inform user that reset password is successful
     const url = frontendURL; // URL: should send Dashboard
-    const emailTilte =
-      '[Media Blog] Welcom! You are reset password successfully';
-    await this.emailService.sendResetMail(user.email, emailTilte, url);
+    const emailTilte = 'Welcom! You are reset password successfully';
+
+    // await this.emailService.sendSignupMail(user.email, emailTilte, url);
+
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: emailTilte,
+      template: './template',
+      context: {
+        url: url,
+        action: 'go to the Media Blog',
+      },
+    });
 
     return {
       message: 'Reset password successfully. You need to login again',
@@ -283,12 +340,22 @@ export class AuthService {
           role: RoleTypes.USER,
           permission: PermissionTypes.COMMENT,
         });
-        const emailTilte = '[Media Blog] Welcom! You are signup successfully';
-        await this.emailService.sendSignupMail(
-          emailAddress,
-          emailTilte,
-          frontendURL,
-        );
+        const emailTilte = 'Welcom! You are signup successfully';
+        // await this.emailService.sendSignupMail(
+        //   emailAddress,
+        //   emailTilte,
+        //   frontendURL,
+        // );
+
+        await this.mailerService.sendMail({
+          to: emailAddress,
+          subject: emailTilte,
+          template: './template',
+          context: {
+            url: frontendURL,
+            action: 'go to the Media Blog',
+          },
+        });
       } catch (error) {
         throw new BadRequestException(error);
       }
@@ -338,7 +405,7 @@ export class AuthService {
     //       role: RoleTypes.USER,
     //       permission: PermissionTypes.COMMENT,
     //     });
-    //     const emailTilte = '[Media Blog] Welcom! You are signup successfully';
+    //     const emailTilte = 'Welcom! You are signup successfully';
     //     await this.emailService.sendSignupMail(
     //       emailAddress,
     //       emailTilte,
