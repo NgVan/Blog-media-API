@@ -23,7 +23,7 @@ import { AppRequest } from 'src/utils/app-request';
 import { ResetPasswordDto } from '../dtos/request/resetPassword.dto';
 import { PermissionTypes, RoleTypes } from 'src/utils/enum';
 import { RegisterDto } from '../dtos/request/register.dto';
-import { MailerService } from '@nest-modules/mailer';
+// import { MailerService } from '@nest-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -32,8 +32,7 @@ export class AuthService {
     private authRepository: Repository<AuthEntity>,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-    private emailService: EmailService,
-    private mailerService: MailerService,
+    private emailService: EmailService, // private mailerService: MailerService,
   ) {}
 
   getTokens(user) {
@@ -129,19 +128,19 @@ export class AuthService {
     });
     if (foundUser) throw new ConflictException('User already exist in system');
 
-    // const url = `${frontendURL}/signup`;
-    // const emailTilte = 'Register new account';
-    // await this.emailService.sendRegisterMail(emailAddress, emailTilte, url);
+    const url = `${frontendURL}/signup`;
+    const emailTilte = 'Register new account';
+    await this.emailService.sendRegisterMail(emailAddress, emailTilte, url);
 
-    await this.mailerService.sendMail({
-      to: emailAddress,
-      subject: 'Register new account',
-      template: './template',
-      context: {
-        url: `${frontendURL}/signup`,
-        action: 'go to the register of Media Blog',
-      },
-    });
+    // await this.mailerService.sendMail({
+    //   to: emailAddress,
+    //   subject: 'Register new account',
+    //   template: './template',
+    //   context: {
+    //     url: `${frontendURL}/signup`,
+    //     action: 'go to the register of Media Blog',
+    //   },
+    // });
     return {
       message: 'Sign up link is sent to your email. Please check your email',
     };
@@ -179,18 +178,18 @@ export class AuthService {
     await this.authRepository.save({ ...tokens, userId: user.id });
 
     // Send mail to inform user that signup is successful
-    // const url = frontendURL; // URL: should send Dashboard
-    // const emailTilte = 'Welcom! You are signup successfully';
-    // await this.emailService.sendSignupMail(emailAddress, emailTilte, url);
-    await this.mailerService.sendMail({
-      to: emailAddress,
-      subject: 'Welcom! You are signup successfully',
-      template: './template',
-      context: {
-        url: frontendURL,
-        action: 'go to the Media Blog',
-      },
-    });
+    const url = frontendURL; // URL: should send Dashboard
+    const emailTilte = 'Welcom! You are signup successfully';
+    await this.emailService.sendSignupMail(emailAddress, emailTilte, url);
+    // await this.mailerService.sendMail({
+    //   to: emailAddress,
+    //   subject: 'Welcom! You are signup successfully',
+    //   template: './template',
+    //   context: {
+    //     url: frontendURL,
+    //     action: 'go to the Media Blog',
+    //   },
+    // });
     return {
       data: tokens,
       message: 'Sign up user account successfully',
@@ -232,18 +231,18 @@ export class AuthService {
     // url : là trỏ đến đường dẫn của Frontend
     const url = `${frontendURL}/reset-password/${tokens.accessToken}`;
 
-    // const emailTilte = 'Reset your password';
-    // await this.emailService.sendMail(emailAddress, emailTilte, url);
+    const emailTilte = 'Reset your password';
+    await this.emailService.sendMail(emailAddress, emailTilte, url);
 
-    await this.mailerService.sendMail({
-      to: emailAddress,
-      subject: 'Reset your password',
-      template: './template',
-      context: {
-        url: url,
-        action: 'reset your account password',
-      },
-    });
+    // await this.mailerService.sendMail({
+    //   to: emailAddress,
+    //   subject: 'Reset your password',
+    //   template: './template',
+    //   context: {
+    //     url: url,
+    //     action: 'reset your account password',
+    //   },
+    // });
     return {
       message:
         'Forgot password link sent to your email with time duration is 2 hours. Please check your email',
@@ -287,17 +286,17 @@ export class AuthService {
     const url = frontendURL; // URL: should send Dashboard
     const emailTilte = 'Welcom! You are reset password successfully';
 
-    // await this.emailService.sendSignupMail(user.email, emailTilte, url);
+    await this.emailService.sendSignupMail(user.email, emailTilte, url);
 
-    await this.mailerService.sendMail({
-      to: user.email,
-      subject: emailTilte,
-      template: './template',
-      context: {
-        url: url,
-        action: 'go to the Media Blog',
-      },
-    });
+    // await this.mailerService.sendMail({
+    //   to: user.email,
+    //   subject: emailTilte,
+    //   template: './template',
+    //   context: {
+    //     url: url,
+    //     action: 'go to the Media Blog',
+    //   },
+    // });
 
     return {
       message: 'Reset password successfully. You need to login again',
@@ -341,21 +340,21 @@ export class AuthService {
           permission: PermissionTypes.COMMENT,
         });
         const emailTilte = 'Welcom! You are signup successfully';
-        // await this.emailService.sendSignupMail(
-        //   emailAddress,
-        //   emailTilte,
-        //   frontendURL,
-        // );
+        await this.emailService.sendSignupMail(
+          emailAddress,
+          emailTilte,
+          frontendURL,
+        );
 
-        await this.mailerService.sendMail({
-          to: emailAddress,
-          subject: emailTilte,
-          template: './template',
-          context: {
-            url: frontendURL,
-            action: 'go to the Media Blog',
-          },
-        });
+        // await this.mailerService.sendMail({
+        //   to: emailAddress,
+        //   subject: emailTilte,
+        //   template: './template',
+        //   context: {
+        //     url: frontendURL,
+        //     action: 'go to the Media Blog',
+        //   },
+        // });
       } catch (error) {
         throw new BadRequestException(error);
       }
