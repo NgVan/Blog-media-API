@@ -33,9 +33,11 @@ export class PostService extends BaseService {
   }
 
   async create(context: RequestContext, payload: PostCreateDto): Promise<any> {
-    const { title, subCategoryId, contents } = payload;
+    const { title, subCategoryId, contents: contentsBody } = payload;
+
+    const contents = JSON.parse(contentsBody);
+
     const userName = get(context, 'user.userName');
-    console.log({ title, subCategoryId, contents, userName });
     let post: any;
     try {
       post = await this.postRepository.save({
@@ -43,7 +45,6 @@ export class PostService extends BaseService {
         subCategoryId,
         author: userName,
       });
-      console.log({ post });
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -56,7 +57,6 @@ export class PostService extends BaseService {
         postId: post.id,
       };
     });
-    console.log({ createdContents });
     try {
       const contentList = await this.contentRepository.insert(createdContents);
       console.log({ contentList });

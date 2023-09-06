@@ -21,7 +21,7 @@ export class PostCreateDto {
   subCategoryId: string;
 
   @ApiProperty()
-  @IsArray()
+  // @IsArray()
   @IsNotEmpty()
-  contents: object[];
+  contents: string; //object[];
 }
