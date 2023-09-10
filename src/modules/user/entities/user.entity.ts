@@ -10,6 +10,9 @@ export class UserEntity extends AbstractEntity {
   @Column({ type: 'varchar', length: 100 })
   userName: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  displayName: string;
+
   @Column({ type: 'varchar', length: 100, unique: true })
   emailAddress: string;
 

@@ -77,11 +77,18 @@ export class AuthService {
   }
 
   async signIn(payload: SignInDto): Promise<any> {
-    const { emailAddress, password } = payload;
+    const { emailOrUserName, password } = payload;
+    let user;
+    user = await this.userRepository.findOneBy({
+      emailAddress: emailOrUserName,
+    });
 
-    const user = await this.userRepository.findOneBy({ emailAddress });
     if (!user) {
-      throw new BadRequestException('Email or password is incorrect');
+      user = await this.userRepository.findOneBy({ userName: emailOrUserName });
+      if (!user)
+        throw new BadRequestException(
+          'Email or userName or password is incorrect',
+        );
     }
     if (user.password === null)
       throw new BadRequestException(
@@ -123,12 +130,36 @@ export class AuthService {
   async register(payload: RegisterDto): Promise<any> {
     const { frontendURL } = new ConfigService();
     const { emailAddress } = payload;
-    const foundUser = await this.userRepository.findOneBy({
+    let user;
+    user = await this.userRepository.findOneBy({
       emailAddress,
     });
-    if (foundUser) throw new ConflictException('User already exist in system');
+    if (user && user.userName !== null)
+      throw new ConflictException(
+        'This Account is exist in system, Please login instead of register',
+      );
+    if (user) {
+      // Delete token and refresh-token after register successfully
+      await this.authRepository.delete({ userId: user.id });
+    } else {
+      try {
+        // Create user in DB
+        user = await this.userRepository.save({
+          emailAddress,
+          role: RoleTypes.USER,
+          permission: PermissionTypes.COMMENT,
+          emailVerified: false,
+        });
+      } catch (error) {
+        throw new BadRequestException(error);
+      }
+    }
 
-    const url = `${frontendURL}/signup`;
+    const tokens = this.getTokens(user);
+    await this.authRepository.save({ ...tokens, userId: user.id });
+
+    const url = `${frontendURL}/signup/${tokens.accessToken}`;
+
     const emailTilte = 'Register new account';
     await this.emailService.sendRegisterMail(emailAddress, emailTilte, url);
 
@@ -142,45 +173,67 @@ export class AuthService {
     //   },
     // });
     return {
-      message: 'Sign up link is sent to your email. Please check your email',
+      message:
+        'Sign up link is sent to your email and it is valid in 2 hours. Please check your email',
     };
   }
 
-  async signUp(payload: SignUpDto): Promise<any> {
+  async signUp(context: AppRequest, payload: SignUpDto): Promise<any> {
     const { frontendURL } = new ConfigService();
-    const { userName, emailAddress, password, passwordConfirm } = payload;
+    const { user } = context;
+    console.log({ user });
 
-    const foundUser = await this.userRepository.findOneBy({ emailAddress });
-    if (foundUser) throw new ConflictException('User has already conflicted');
+    const { userName, displayName, password, passwordConfirm } = payload;
+    console.log({ payload });
+
+    const foundUser = await this.userRepository.findOneBy({ id: user.id });
+    if (!foundUser)
+      throw new BadRequestException(
+        'User do not exist in system. You need register account before sign up',
+      );
     if (!validatePassword(password))
       throw new BadRequestException('Invalid Password!');
 
     if (password !== passwordConfirm)
       throw new BadRequestException('Confirm password not match with password');
 
-    let user: any;
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
     try {
-      // Create user in DB
-      user = await this.userRepository.save({
+      // Update user in DB
+      await this.userRepository.save({
+        id: user.sub,
         userName,
-        emailAddress,
+        displayName,
         password: hashedPassword,
-        role: RoleTypes.USER,
-        permission: PermissionTypes.COMMENT,
+        emailVerified: true,
       });
     } catch (error) {
       throw new BadRequestException(error);
     }
 
-    const tokens = this.getTokens(user);
-    await this.authRepository.save({ ...tokens, userId: user.id });
+    const tokens = this.getTokens(foundUser);
+
+    const foundAuth = await this.authRepository
+      .createQueryBuilder('auth')
+      .where('auth.userId = :userId', { userId: foundUser.id })
+      .andWhere('auth.refreshToken IS NOT NULL')
+      .getOne();
+
+    await this.authRepository.save({
+      id: foundAuth.id,
+      ...tokens,
+    });
+    // Update record
 
     // Send mail to inform user that signup is successful
     const url = frontendURL; // URL: should send Dashboard
     const emailTilte = 'Welcom! You are signup successfully';
-    await this.emailService.sendSignupMail(emailAddress, emailTilte, url);
+    await this.emailService.sendSignupMail(
+      foundUser.emailAddress,
+      emailTilte,
+      url,
+    );
     // await this.mailerService.sendMail({
     //   to: emailAddress,
     //   subject: 'Welcom! You are signup successfully',

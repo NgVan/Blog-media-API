@@ -52,13 +52,14 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'SignUp' })
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS,
   })
-  @Post('signup')
-  signUp(@Body() payload: SignUpDto) {
-    return this.authService.signUp(payload);
+  @Post('signup/:token')
+  signUp(@Req() request: AppRequest, @Body() payload: SignUpDto) {
+    return this.authService.signUp(request, payload);
   }
 
   @HttpCode(HttpStatus.OK)
