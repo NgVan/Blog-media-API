@@ -186,7 +186,9 @@ export class AuthService {
     const { userName, displayName, password, passwordConfirm } = payload;
     console.log({ payload });
 
-    const foundUser = await this.userRepository.findOneBy({ id: user.id });
+    const foundUser = await this.userRepository.findOneBy({
+      id: user?.id || user?.sub,
+    });
     if (!foundUser)
       throw new BadRequestException(
         'User do not exist in system. You need register account before sign up',
