@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Length, IsNotEmpty, NotEquals } from 'class-validator';
+import {
+  IsString,
+  Length,
+  IsNotEmpty,
+  NotEquals,
+  IsOptional,
+} from 'class-validator';
 
 export class SubCatCreateDto {
   @ApiProperty()
@@ -10,6 +16,7 @@ export class SubCatCreateDto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   picture: string;
 
   @ApiProperty()
