@@ -8,6 +8,7 @@ export class CategoryDto extends AbstractDto {
     super(categoryEntity);
     this.name = categoryEntity.name;
     this.picture = categoryEntity.picture;
+    this.isAlbum = categoryEntity.isAlbum;
     this.subCategories = categoryEntity.subCategories;
   }
   @ApiProperty({ required: false })
@@ -15,6 +16,9 @@ export class CategoryDto extends AbstractDto {
 
   @ApiProperty({ required: false })
   picture: string;
+
+  @ApiProperty({ required: false })
+  isAlbum: boolean;
 
   @ApiProperty({ required: false })
   subCategories: SubCategoryEntity[];

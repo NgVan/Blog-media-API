@@ -12,6 +12,9 @@ export class CategoryEntity extends AbstractEntity {
   @Column({ type: 'text' })
   picture: string;
 
+  @Column({ type: 'boolean' })
+  isAlbum: boolean;
+
   @OneToMany(
     () => SubCategoryEntity,
     (subCategory: any) => subCategory.category,
