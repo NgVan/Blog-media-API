@@ -4,6 +4,7 @@ import { IsOptional, IsString, Length } from 'class-validator';
 export class SubCatUpdateDto {
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @Length(1, 20)
   name: string;
 
