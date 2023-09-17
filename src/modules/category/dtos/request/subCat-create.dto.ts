@@ -10,6 +10,10 @@ export class SubCatCreateDto {
 
   @ApiProperty()
   @IsString()
+  picture: string;
+
+  @ApiProperty()
+  @IsString()
   @IsNotEmpty()
   @NotEquals(null)
   categoryId: string;

@@ -10,6 +10,9 @@ export class SubCategoryEntity extends AbstractEntity {
   @Column({ type: 'varchar' })
   name: string;
 
+  @Column({ type: 'text' })
+  picture: string;
+
   @Column({ type: 'varchar', length: 36 })
   categoryId: string;
 

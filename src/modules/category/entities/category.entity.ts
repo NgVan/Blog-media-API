@@ -9,6 +9,9 @@ export class CategoryEntity extends AbstractEntity {
   @Column({ type: 'varchar' })
   name: string;
 
+  @Column({ type: 'text' })
+  picture: string;
+
   @OneToMany(
     () => SubCategoryEntity,
     (subCategory: any) => subCategory.category,

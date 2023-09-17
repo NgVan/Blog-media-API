@@ -7,4 +7,9 @@ export class CreateCatDto {
   @IsNotEmpty()
   @Length(1, 20)
   name: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  picture: string;
 }
