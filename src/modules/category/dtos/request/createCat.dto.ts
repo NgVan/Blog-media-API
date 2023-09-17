@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  Length,
-  IsNotEmpty,
-  IsBoolean,
-  IsOptional,
-} from 'class-validator';
+import { IsString, Length, IsNotEmpty, IsBoolean } from 'class-validator';
 
 export class CreateCatDto {
   @ApiProperty()
@@ -21,6 +15,6 @@ export class CreateCatDto {
 
   @ApiProperty()
   @IsBoolean()
-  @IsOptional()
+  @IsNotEmpty()
   isAlbum: boolean;
 }

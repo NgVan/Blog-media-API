@@ -80,11 +80,13 @@ export class AuthService {
     const { emailOrUserName, password } = payload;
     let user;
     user = await this.userRepository.findOneBy({
-      emailAddress: emailOrUserName,
+      emailAddress: emailOrUserName.replace(/\s+/g, ''),
     });
 
     if (!user) {
-      user = await this.userRepository.findOneBy({ userName: emailOrUserName });
+      user = await this.userRepository.findOneBy({
+        userName: emailOrUserName.replace(/\s+/g, ''),
+      });
       if (!user)
         throw new BadRequestException(
           'Email or userName or password is incorrect',
@@ -205,7 +207,7 @@ export class AuthService {
       // Update user in DB
       await this.userRepository.save({
         id: user.sub,
-        userName,
+        userName: userName.replace(/\s+/g, ''),
         displayName,
         password: hashedPassword,
         emailVerified: true,
