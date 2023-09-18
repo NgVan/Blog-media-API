@@ -20,11 +20,15 @@ export class CategoryService {
   ) {}
 
   async create(payload: CreateCatDto): Promise<any> {
-    const { name } = payload;
+    const { name, picture, isAlbum } = payload;
     const foundCategory = await this.catRepository.findOneBy({ name });
     if (foundCategory)
       throw new ConflictException('Category has already existed');
-    const category = await this.catRepository.save(payload);
+    const category = await this.catRepository.save({
+      name,
+      picture,
+      isAlbum: isAlbum === '1' ? true : false,
+    });
     return {
       data: category,
       message: 'Create category successfully',
