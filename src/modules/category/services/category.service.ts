@@ -38,6 +38,13 @@ export class CategoryService {
   async update(payload: UpdateCatDto, id: string): Promise<any> {
     const foundCategory = await this.catRepository.findOneBy({ id });
     if (!foundCategory) throw new NotFoundException('Not found category');
+
+    const existCategory = await this.catRepository.findOneBy({
+      name: payload.name,
+    });
+    if (existCategory)
+      throw new ConflictException('Category has already existed');
+
     const category = await this.catRepository.save({
       id,
       ...payload,
