@@ -31,21 +31,34 @@ export class SubCategoryService {
   }
 
   async update(payload: SubCatUpdateDto, id: string): Promise<any> {
-    const foundCategory = await this.subCatRepository.findOneBy({ id });
-    if (!foundCategory) throw new NotFoundException('Not found Sub-Category');
+    const foundSubCategory = await this.subCatRepository.findOneBy({ id });
+    if (!foundSubCategory)
+      throw new NotFoundException('Not found Sub-Category');
 
     const existSubCategory = await this.subCatRepository.findOneBy({
       name: payload.name,
     });
-    if (existSubCategory)
-      throw new ConflictException('Sub-Category has already existed');
 
-    const category = await this.subCatRepository.save({
-      id,
-      ...payload,
-    });
+    let subCategory;
+    if (!existSubCategory)
+      subCategory = await this.subCatRepository.save({
+        id,
+        ...payload,
+      });
+    else {
+      if (
+        payload.name.toLocaleLowerCase() ===
+        foundSubCategory.name.toLocaleLowerCase()
+      )
+        subCategory = await this.subCatRepository.save({
+          id,
+          ...payload,
+        });
+      else throw new ConflictException('Sub-Category has already existed');
+    }
+
     return {
-      data: category,
+      data: subCategory,
       message: 'Update Sub-category successfully',
     };
   }

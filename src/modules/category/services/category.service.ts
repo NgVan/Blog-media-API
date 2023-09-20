@@ -11,6 +11,7 @@ import { CategoryEntity } from '../entities/category.entity';
 import { CatQueryDto } from '../dtos/request/CatQuery.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import { CategoryDto } from '../dtos/response/cat.dto';
+import { IsPhoneNumber } from 'class-validator';
 
 @Injectable()
 export class CategoryService {
@@ -42,13 +43,25 @@ export class CategoryService {
     const existCategory = await this.catRepository.findOneBy({
       name: payload.name,
     });
-    if (existCategory)
-      throw new ConflictException('Category has already existed');
 
-    const category = await this.catRepository.save({
-      id,
-      ...payload,
-    });
+    let category;
+    if (!existCategory)
+      category = await this.catRepository.save({
+        id,
+        ...payload,
+      });
+    else {
+      if (
+        payload.name.toLocaleLowerCase() ===
+        foundCategory.name.toLocaleLowerCase()
+      )
+        category = await this.catRepository.save({
+          id,
+          ...payload,
+        });
+      else throw new ConflictException('Category has already existed');
+    }
+
     return {
       data: category,
       message: 'Update category successfully',
