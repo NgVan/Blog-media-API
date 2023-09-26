@@ -16,6 +16,7 @@ import { PostDto } from '../dtos/response/post.dto';
 import { AbstractFilterDto } from 'src/database/dtos/abstract-filter.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import { PostUpdateDto } from '../dtos/request/post-update.dto';
+import { PostQueryDto } from '../dtos/request/post-query.dto';
 
 @Injectable()
 export class PostService extends BaseService {
@@ -148,30 +149,78 @@ export class PostService extends BaseService {
     return foundPost.toDto();
   }
 
-  async getList(filter: AbstractFilterDto): Promise<any> {
+  async getList(filter: PostQueryDto): Promise<any> {
     const {
       page = DEFAULT_VALUE_FILTER.PAGE,
       limit = DEFAULT_VALUE_FILTER.LIMIT,
+      categoryId,
+      like,
     } = filter;
     const totalSkip = limit * (page - 1);
 
     const query = this.postRepository
       .createQueryBuilder('post')
-      .innerJoinAndSelect('post.contents', 'c')
-      .orderBy('c.displayOrder', 'ASC')
+      .innerJoinAndSelect('post.subCategory', 'subCategory') // Liên kết với SubCategory
+      .innerJoinAndSelect('subCategory.category', 'category') // Liên kết với Category
+      // .innerJoinAndSelect('post.contents', 'c')
+      // .orderBy('c.displayOrder', 'ASC')
+      // .where('category.id = :categoryId', { categoryId: yourCategoryId }) // Thay yourCategoryId bằng ID của Category bạn muốn lấy
       .take(limit)
       .skip(totalSkip);
-    const [res, total] = await query.clone().getManyAndCount();
+    if (categoryId) query.where('category.id = :categoryId', { categoryId });
 
-    // const [res, total] = await this.postRepository.findAndCount({
-    //   take: limit,
-    //   skip: totalSkip,
-    //   relations: ['contents'], // Lấy cả danh sách nội dung
-    //   order: { 'contents.displayOrder': 'ASC' }, // Sắp xếp theo displayOrder
-    // });
+    const [res, total] = await query.clone().getManyAndCount();
+    const formattedResult = [];
+    const categoryMap = new Map();
+
+    res.forEach((entity) => {
+      const categoryId = entity.subCategory.category.id;
+      const post = {
+        id: entity.id,
+        title: entity.title,
+        description: entity.description,
+        author: entity.author,
+        like: entity.like,
+        created: entity.created,
+        createdTime: new Date(entity.created).getTime(),
+      };
+      const category = {
+        id: categoryId,
+        name: entity.subCategory.category.name,
+        picture: entity.subCategory.category.picture,
+        isAlbum: entity.subCategory.category.isAlbum,
+      };
+
+      // Kiểm tra xem Category đã được thêm vào formatEntities chưa
+      if (!categoryMap.has(categoryId)) {
+        categoryMap.set(categoryId, {
+          category,
+          posts: [],
+        });
+      }
+
+      // Thêm bài viết vào danh sách của Category
+      categoryMap.get(categoryId).posts.push(post);
+    });
+
+    // Sắp xếp các bài viết trong mỗi Category theo trường 'created' giảm dần
+    categoryMap.forEach((category) => {
+      category.posts.sort((a, b) => b.createdTime - a.createdTime);
+      if (like && like === 'DESC') {
+        category.posts.sort((a, b) => b.like - a.like);
+      }
+      if (like && like === 'ASC') {
+        category.posts.sort((a, b) => a.like - b.like);
+      }
+      formattedResult.push(category);
+    });
+
+    formattedResult.sort((a, b) =>
+      a.category.name.localeCompare(b.category.name),
+    );
 
     return {
-      entities: res,
+      entities: formattedResult,
       totalEntities: total,
     };
   }

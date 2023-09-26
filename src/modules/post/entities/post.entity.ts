@@ -5,6 +5,7 @@ import { ContentEntity } from './content.entity';
 import { SubCategoryEntity } from 'src/modules/category/entities/subCategory.entity';
 import { PostDto } from '../dtos/response/post.dto';
 import { CommentEntity } from '../../comment/entities/comment.entity';
+import { UserPostEntity } from './userpost.entity';
 
 export const POST_TABLE = 'post';
 
@@ -13,16 +14,26 @@ export class PostEntity extends AbstractEntity {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
+  @Column({ type: 'text' })
+  description: string;
+
+  @Column({ type: 'int' })
+  like: number;
+
   @Column({ type: 'varchar', length: 50 })
   author: string;
 
   @Column({ type: 'varchar', length: 36 })
   subCategoryId: string;
 
-  @OneToMany(() => ContentEntity, (content: any) => content.post, {
-    eager: true,
-    cascade: true,
-  })
+  @OneToMany(
+    () => ContentEntity,
+    (content: any) => content.post,
+    // {
+    //   eager: true,
+    //   cascade: true,
+    // }
+  )
   // @JoinColumn()
   contents: ContentEntity[];
 
@@ -32,6 +43,12 @@ export class PostEntity extends AbstractEntity {
   })
   // @JoinColumn()
   comments: CommentEntity[];
+
+  @OneToMany(() => UserPostEntity, (userpost: any) => userpost.post, {
+    eager: true,
+    cascade: true,
+  })
+  userPosts: UserPostEntity[];
 
   @ManyToOne(() => SubCategoryEntity, (subCate) => subCate.posts)
   subCategory: SubCategoryEntity;

@@ -27,6 +27,7 @@ import { PostFilterDto } from './dtos/response/post-filter.dto';
 import { PermissionsGuard } from '../auth/guards/permission.guard';
 import { Permissions } from '../auth/guards/list.decorator';
 import { PermissionTypes } from 'src/utils/enum';
+import { PostQueryDto } from './dtos/request/post-query.dto';
 
 @ApiTags('Posts')
 @Controller('post')
@@ -75,8 +76,8 @@ export class PostController {
   @Get('filter')
   getList(
     @Req() request: AppRequest,
-    @Query() filter: AbstractFilterDto,
-  ): Promise<PostFilterDto> {
+    @Query() filter: PostQueryDto,
+  ): Promise<any> {
     return this.postService.getList(filter);
   }
 

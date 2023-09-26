@@ -19,7 +19,10 @@ export class ContentEntity extends AbstractEntity {
   @Column({ type: 'varchar', length: 36 })
   postId: string;
 
-  @ManyToOne(() => PostEntity, (post) => post.contents)
+  @ManyToOne(() => PostEntity, (post) => post.contents, {
+    eager: true,
+    cascade: true,
+  })
   @JoinColumn()
   post: PostEntity;
 }

@@ -33,6 +33,7 @@ import { UserUpdateProfileDto } from './dtos/request/user-update-profile.dto';
 import { PermissionsGuard } from '../auth/guards/permission.guard';
 import { Permissions } from '../auth/guards/list.decorator';
 import { PermissionTypes } from 'src/utils/enum';
+import { LikePostDto } from './dtos/request/user-like-post.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth('access-token')
@@ -125,6 +126,20 @@ export class UserController {
     @Body() payload: UserUpdateProfileDto,
   ): Promise<UserDto> {
     return this.userService.updateProfile(request, payload);
+  }
+
+  @ApiOperation({ summary: 'Like Post' })
+  @ApiResponse({ status: HttpStatus.OK, description: SUCCESS })
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Put('/post/:postId')
+  likePost(
+    @Req() request: AppRequest,
+    @Param('postId') postId: string,
+  ): Promise<UserDto> {
+    console.log('GOO CONTR');
+
+    return this.userService.likePost(request, postId);
   }
 
   @ApiOperation({ summary: 'Delete One User' })

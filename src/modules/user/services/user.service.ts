@@ -19,6 +19,8 @@ import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import * as bcrypt from 'bcrypt';
 import { PermissionTypes, RoleTypes } from 'src/utils/enum';
 import { AuthEntity } from 'src/modules/auth/entities/auth.entity';
+import { UserPostEntity } from 'src/modules/post/entities/userpost.entity';
+import { PostEntity } from 'src/modules/post/entities/post.entity';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -29,6 +31,10 @@ export class UserService extends BaseService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(AuthEntity)
     private authRepository: Repository<AuthEntity>,
+    @InjectRepository(UserPostEntity)
+    private userPostRepository: Repository<UserPostEntity>,
+    @InjectRepository(PostEntity)
+    private postRepository: Repository<PostEntity>,
     private configService: ConfigService,
   ) {
     super(userRepository, 'User');
@@ -183,6 +189,44 @@ export class UserService extends BaseService {
       },
       message: 'Update current user successfully',
     };
+  }
+
+  async likePost(context: RequestContext, postId: string): Promise<any> {
+    try {
+      const user = get(context, 'user');
+
+      const data = await this.userRepository.findOneBy({ id: user.sub });
+      if (!data) throw new NotFoundException('User not found');
+      const findPost = await this.postRepository.findOneBy({ id: postId });
+      if (!findPost) throw new NotFoundException('Post not found');
+
+      const findUserPost = await this.userPostRepository.findOneBy({
+        userId: user.sub,
+        postId,
+      });
+      let result = '';
+      if (!findUserPost) {
+        await this.userPostRepository.save({
+          userId: user.sub,
+          postId,
+        });
+        await this.postRepository.save({
+          id: postId,
+          like: findPost.like + 1,
+        });
+        result = 'Like Post Successfully';
+      } else {
+        await this.userPostRepository.delete({ userId: user.sub, postId });
+        await this.postRepository.save({
+          id: postId,
+          like: findPost.like - 1,
+        });
+        result = 'DisLike Post Successfully';
+      }
+      return { message: result };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async findUser(emailAddress: string): Promise<any> {

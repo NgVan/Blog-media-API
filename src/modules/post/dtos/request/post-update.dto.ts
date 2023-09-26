@@ -16,6 +16,11 @@ export class PostUpdateDto {
   title: string;
 
   @ApiProperty()
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @ApiProperty()
   @IsArray()
   @IsOptional()
   contents?: object[];

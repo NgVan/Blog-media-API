@@ -4,7 +4,7 @@ import {
   Length,
   IsNotEmpty,
   NotEquals,
-  IsArray,
+  IsOptional,
 } from 'class-validator';
 
 export class PostCreateDto {
@@ -13,6 +13,11 @@ export class PostCreateDto {
   @IsNotEmpty()
   @Length(1, 255)
   title: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  description: string;
 
   @ApiProperty()
   @IsString()
