@@ -9,6 +9,7 @@ export class PostDto extends AbstractDto {
   constructor(postEntity: PostEntity = <PostEntity>{}) {
     super(postEntity);
     this.title = postEntity.title;
+    this.picture = postEntity.picture;
     this.description = postEntity.description;
     this.author = postEntity.author;
     this.like = postEntity.like;
@@ -18,6 +19,9 @@ export class PostDto extends AbstractDto {
   }
   @ApiProperty({ required: false })
   title: string;
+
+  @ApiProperty({ required: false })
+  picture: string;
 
   @ApiProperty({ required: false })
   description: string;

@@ -15,6 +15,9 @@ export class PostEntity extends AbstractEntity {
   title: string;
 
   @Column({ type: 'text' })
+  picture: string;
+
+  @Column({ type: 'text' })
   description: string;
 
   @Column({ type: 'int' })

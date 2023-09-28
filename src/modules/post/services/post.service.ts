@@ -34,7 +34,13 @@ export class PostService extends BaseService {
   }
 
   async create(context: RequestContext, payload: PostCreateDto): Promise<any> {
-    const { title, subCategoryId, contents: contentsBody } = payload;
+    const {
+      title,
+      subCategoryId,
+      description,
+      picture,
+      contents: contentsBody,
+    } = payload;
 
     const contents = JSON.parse(contentsBody);
 
@@ -44,6 +50,8 @@ export class PostService extends BaseService {
       post = await this.postRepository.save({
         title,
         subCategoryId,
+        description,
+        picture,
         author: userName,
       });
     } catch (error) {
@@ -72,7 +80,8 @@ export class PostService extends BaseService {
   }
 
   async update(payload: PostUpdateDto, id: string): Promise<any> {
-    const { title, contents } = payload;
+    const { title, picture, description, contents: contentsBody } = payload;
+    const contents = JSON.parse(contentsBody);
     const foundPost = await this.postRepository.findOneBy({ id });
 
     if (title) {
@@ -80,6 +89,8 @@ export class PostService extends BaseService {
         await this.postRepository.save({
           id,
           title,
+          picture,
+          description,
         });
       } catch (error) {
         throw new BadRequestException(error);
@@ -132,21 +143,25 @@ export class PostService extends BaseService {
     };
   }
 
-  async getOne(id: string): Promise<PostDto> {
+  async getOne(id: string): Promise<any> {
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.comments', 'c')
       .leftJoinAndSelect('post.contents', 'ct')
+      .leftJoinAndSelect('post.subCategory', 'subCa')
+      // .leftJoinAndSelect('subCa.category', 'cate')
       .leftJoin('c.user', 'u')
       .where('post.id = :id', { id })
-      // .orderBy('c.created', 'ASC');
       .addSelect(['u.userName']);
 
     const foundPost = await query.getOne();
+    const categoryId = foundPost.subCategory.categoryId;
+    delete foundPost['subCategory'];
+
     if (!foundPost) throw new NotFoundException('Not found post');
     // const post = new PostDto(foundPost);
     // return post;
-    return foundPost.toDto();
+    return { ...foundPost.toDto(), categoryId };
   }
 
   async getList(filter: PostQueryDto): Promise<any> {
@@ -154,6 +169,7 @@ export class PostService extends BaseService {
       page = DEFAULT_VALUE_FILTER.PAGE,
       limit = DEFAULT_VALUE_FILTER.LIMIT,
       categoryId,
+      subCategoryId,
       like,
     } = filter;
     const totalSkip = limit * (page - 1);
@@ -167,6 +183,8 @@ export class PostService extends BaseService {
       // .where('category.id = :categoryId', { categoryId: yourCategoryId }) // Thay yourCategoryId bằng ID của Category bạn muốn lấy
       .take(limit)
       .skip(totalSkip);
+    if (subCategoryId)
+      query.where('subCategory.id = :subCategoryId', { subCategoryId });
     if (categoryId) query.where('category.id = :categoryId', { categoryId });
 
     const [res, total] = await query.clone().getManyAndCount();
@@ -178,6 +196,7 @@ export class PostService extends BaseService {
       const post = {
         id: entity.id,
         title: entity.title,
+        picture: entity.picture,
         description: entity.description,
         author: entity.author,
         like: entity.like,

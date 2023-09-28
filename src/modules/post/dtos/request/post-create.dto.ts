@@ -21,6 +21,11 @@ export class PostCreateDto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
+  picture: string;
+
+  @ApiProperty()
+  @IsString()
   @IsNotEmpty()
   @NotEquals(null)
   subCategoryId: string;
