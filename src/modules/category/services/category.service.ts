@@ -11,13 +11,15 @@ import { CategoryEntity } from '../entities/category.entity';
 import { CatQueryDto } from '../dtos/request/CatQuery.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import { CategoryDto } from '../dtos/response/cat.dto';
-import { IsPhoneNumber } from 'class-validator';
+import { PostEntity } from 'src/modules/post/entities/post.entity';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(CategoryEntity)
     private catRepository: Repository<CategoryEntity>,
+    @InjectRepository(PostEntity)
+    private postRepository: Repository<PostEntity>,
   ) {}
 
   async create(payload: CreateCatDto): Promise<any> {
@@ -102,6 +104,19 @@ export class CategoryService {
     };
   }
 
+  async getPostList(): Promise<any> {
+    const categories = await this.catRepository.find({});
+
+    const categoriesWithPosts = await Promise.all(
+      categories.map(async (category) => {
+        const posts = await this.getTopFourPosts(category.id);
+        if (posts && posts.length > 0) return { ...category, posts };
+      }),
+    );
+
+    return categoriesWithPosts.filter((i) => i !== undefined);
+  }
+
   async delete(id: string): Promise<any> {
     const foundCategory = await this.catRepository.findOneBy({ id });
     if (!foundCategory) throw new NotFoundException('Not found category');
@@ -113,5 +128,16 @@ export class CategoryService {
     return {
       message: 'Delete category successfully',
     };
+  }
+
+  async getTopFourPosts(categoryId: string) {
+    return this.postRepository
+      .createQueryBuilder('post')
+      .innerJoin('post.subCategory', 'subCategory') // Liên kết với SubCategory
+      .innerJoin('subCategory.category', 'category') // Liên kết với Category
+      .where('category.id = :categoryId', { categoryId })
+      .orderBy('post.created', 'DESC')
+      .limit(4)
+      .getMany();
   }
 }

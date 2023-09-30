@@ -19,9 +19,13 @@ export class SubCategoryEntity extends AbstractEntity {
   @ManyToOne(() => CategoryEntity, (category) => category.subCategories)
   category: CategoryEntity;
 
-  @OneToMany(() => PostEntity, (post: any) => post.subCategory, {
-    eager: true,
-    cascade: true,
-  })
+  @OneToMany(
+    () => PostEntity,
+    (post: any) => post.subCategory,
+    // {
+    //   eager: true,
+    //   cascade: true,
+    // }
+  )
   posts: PostEntity[];
 }

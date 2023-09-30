@@ -18,10 +18,10 @@ export class CategoryEntity extends AbstractEntity {
   @OneToMany(
     () => SubCategoryEntity,
     (subCategory: any) => subCategory.category,
-    {
-      eager: true,
-      cascade: true,
-    },
+    // {
+    //   eager: true,
+    //   cascade: true,
+    // },
   )
   subCategories: SubCategoryEntity[];
 }

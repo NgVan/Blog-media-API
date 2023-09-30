@@ -8,6 +8,7 @@ import { AbstractEntity } from '../../database/entities/abstract.entity';
 import { SubCategoryController } from './subCategory.controller';
 import { SubCategoryService } from './services/subCategory.service';
 import { SubCategoryEntity } from './entities/subCategory.entity';
+import { PostEntity } from '../post/entities/post.entity';
 
 @Module({
   controllers: [CategoryController, SubCategoryController],
@@ -17,6 +18,7 @@ import { SubCategoryEntity } from './entities/subCategory.entity';
       CategoryEntity,
       SubCategoryEntity,
       AbstractEntity,
+      PostEntity,
     ]),
   ],
   providers: [CategoryService, SubCategoryService],

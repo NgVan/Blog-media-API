@@ -78,6 +78,17 @@ export class CategoryController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get List Category with Post' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: SUCCESS,
+  })
+  @Get('post')
+  getPostList(@Req() request: AppRequest): Promise<any> {
+    return this.categoryService.getPostList();
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get One Category' })
   @ApiResponse({
     status: HttpStatus.OK,

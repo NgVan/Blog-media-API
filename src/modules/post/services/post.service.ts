@@ -13,7 +13,6 @@ import { PostEntity } from '../entities/post.entity';
 import { PostCreateDto } from '../dtos/request/post-create.dto';
 import { ContentEntity } from '../entities/content.entity';
 import { PostDto } from '../dtos/response/post.dto';
-import { AbstractFilterDto } from 'src/database/dtos/abstract-filter.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import { PostUpdateDto } from '../dtos/request/post-update.dto';
 import { PostQueryDto } from '../dtos/request/post-query.dto';
