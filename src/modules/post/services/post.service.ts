@@ -159,9 +159,29 @@ export class PostService extends BaseService {
     delete foundPost['subCategory'];
 
     if (!foundPost) throw new NotFoundException('Not found post');
-    // const post = new PostDto(foundPost);
-    // return post;
-    return { ...foundPost.toDto(), categoryId };
+
+    const prevPost = await this.postRepository
+      .createQueryBuilder('post')
+      .leftJoin('post.subCategory', 'subCa')
+      .leftJoin('subCa.category', 'cate')
+      .where('cate.id = :categoryId', { categoryId })
+      .andWhere('post.created < :created', { created: foundPost.created })
+      .orderBy('post.created', 'DESC')
+      .limit(1)
+      .getOne();
+
+    const nextPost = await this.postRepository
+      .createQueryBuilder('post')
+      .leftJoin('post.subCategory', 'subCa')
+      .leftJoin('subCa.category', 'cate')
+      .where('cate.id = :categoryId', { categoryId })
+      .andWhere('post.created > :created', { created: foundPost.created })
+      .andWhere('post.id != :postId', { postId: foundPost.id })
+      .orderBy('post.created', 'ASC')
+      .limit(1)
+      .getOne();
+
+    return { ...foundPost.toDto(), prevPost, nextPost };
   }
 
   async getList(filter: PostQueryDto): Promise<any> {
