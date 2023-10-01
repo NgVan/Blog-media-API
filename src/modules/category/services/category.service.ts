@@ -110,11 +110,15 @@ export class CategoryService {
     const categoriesWithPosts = await Promise.all(
       categories.map(async (category) => {
         const posts = await this.getTopFourPosts(category.id);
+        delete category.subCategories;
         if (posts && posts.length > 0) return { ...category, posts };
       }),
     );
-
-    return categoriesWithPosts.filter((i) => i !== undefined);
+    const result = categoriesWithPosts.filter((i) => i !== undefined);
+    return {
+      entities: result,
+      totalEntities: result.length,
+    };
   }
 
   async delete(id: string): Promise<any> {
