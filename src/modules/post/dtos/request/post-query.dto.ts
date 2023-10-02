@@ -12,4 +12,7 @@ export class PostQueryDto extends AbstractFilterDto {
 
   @ApiProperty({ required: false, default: '' })
   like?: string;
+
+  @ApiProperty({ required: false, default: DEFAULT_VALUE_FILTER.SEARCH_QUERY })
+  searchQuery?: string = DEFAULT_VALUE_FILTER.SEARCH_QUERY;
 }

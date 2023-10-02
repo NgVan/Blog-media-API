@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Brackets } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { get } from 'lodash';
 import { ConfigService } from '../../shared/services/config.service';
@@ -66,8 +66,7 @@ export class PostService extends BaseService {
       };
     });
     try {
-      const contentList = await this.contentRepository.insert(createdContents);
-      console.log({ contentList });
+      await this.contentRepository.insert(createdContents);
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -183,7 +182,7 @@ export class PostService extends BaseService {
     return { ...foundPost.toDto(), prevPost, nextPost };
   }
 
-  async getList(filter: PostQueryDto): Promise<any> {
+  async getListPostByCategory(filter: PostQueryDto): Promise<any> {
     const {
       page = DEFAULT_VALUE_FILTER.PAGE,
       limit = DEFAULT_VALUE_FILTER.LIMIT,
@@ -199,12 +198,11 @@ export class PostService extends BaseService {
       .innerJoinAndSelect('subCategory.category', 'category') // Liên kết với Category
       // .innerJoinAndSelect('post.contents', 'c')
       // .orderBy('c.displayOrder', 'ASC')
-      // .where('category.id = :categoryId', { categoryId: yourCategoryId }) // Thay yourCategoryId bằng ID của Category bạn muốn lấy
       .take(limit)
       .skip(totalSkip);
     if (subCategoryId)
-      query.where('subCategory.id = :subCategoryId', { subCategoryId });
-    if (categoryId) query.where('category.id = :categoryId', { categoryId });
+      query.andWhere('subCategory.id = :subCategoryId', { subCategoryId });
+    if (categoryId) query.andWhere('category.id = :categoryId', { categoryId });
 
     const [res, total] = await query.clone().getManyAndCount();
     const formattedResult = [];
@@ -259,6 +257,49 @@ export class PostService extends BaseService {
 
     return {
       entities: formattedResult,
+      totalEntities: total,
+    };
+  }
+
+  async getList(filter: PostQueryDto): Promise<any> {
+    const {
+      page = DEFAULT_VALUE_FILTER.PAGE,
+      limit = DEFAULT_VALUE_FILTER.LIMIT,
+      categoryId,
+      subCategoryId,
+      like,
+      searchQuery,
+    } = filter;
+    const orderByLike: any = like;
+
+    const totalSkip = limit * (page - 1);
+
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .innerJoin('post.subCategory', 'subCategory')
+      .innerJoin('subCategory.category', 'category')
+      .orderBy('post.created', 'DESC')
+      .where(
+        new Brackets((query) => {
+          query.where('post.title LIKE :searchQuery');
+        }),
+      )
+      .setParameters({ searchQuery: `%${searchQuery}%` })
+      .take(limit)
+      .skip(totalSkip);
+
+    if (subCategoryId)
+      query.andWhere('subCategory.id = :subCategoryId', { subCategoryId });
+    if (categoryId) query.andWhere('category.id = :categoryId', { categoryId });
+    if (orderByLike) {
+      query
+        .orderBy('post.like', orderByLike)
+        .addOrderBy('post.created', 'DESC');
+    }
+    const [res, total] = await query.clone().getManyAndCount();
+
+    return {
+      entities: res,
       totalEntities: total,
     };
   }

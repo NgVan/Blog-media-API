@@ -40,10 +40,14 @@ export class PostEntity extends AbstractEntity {
   // @JoinColumn()
   contents: ContentEntity[];
 
-  @OneToMany(() => CommentEntity, (comment: any) => comment.post, {
-    eager: true,
-    cascade: true,
-  })
+  @OneToMany(
+    () => CommentEntity,
+    (comment: any) => comment.post,
+    // {
+    //   eager: true,
+    //   cascade: true,
+    // }
+  )
   // @JoinColumn()
   comments: CommentEntity[];
 
