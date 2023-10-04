@@ -12,4 +12,8 @@ export class UpdateCatDto {
   @IsString()
   @IsOptional()
   picture: string;
+
+  @ApiProperty()
+  @IsOptional()
+  orderNo: number;
 }

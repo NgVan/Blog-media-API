@@ -27,10 +27,17 @@ export class CategoryService {
     const foundCategory = await this.catRepository.findOneBy({ name });
     if (foundCategory)
       throw new ConflictException('Category has already existed');
+    const lastCategory = await this.catRepository.findOne({
+      where: {},
+      order: { orderNo: 'DESC' },
+    });
+    let nextOrder = 1;
+    if (lastCategory) nextOrder = lastCategory.orderNo + 1;
     const category = await this.catRepository.save({
       name,
       picture,
       isAlbum: isAlbum === '1' ? true : false,
+      orderNo: nextOrder,
     });
     return {
       data: category,
@@ -39,9 +46,20 @@ export class CategoryService {
   }
 
   async update(payload: UpdateCatDto, id: string): Promise<any> {
+    console.log({ payload });
+
     const foundCategory = await this.catRepository.findOneBy({ id });
     if (!foundCategory) throw new NotFoundException('Not found category');
+    let findCateByOrder;
+    let currentOrder;
+    if (payload.orderNo) {
+      console.log('GO TO 1');
 
+      currentOrder = foundCategory.orderNo;
+      findCateByOrder = await this.catRepository.findOneBy({
+        orderNo: payload.orderNo,
+      });
+    }
     const existCategory = await this.catRepository.findOneBy({
       name: payload.name,
     });
@@ -51,6 +69,7 @@ export class CategoryService {
       category = await this.catRepository.save({
         id,
         ...payload,
+        orderNo: payload.orderNo,
       });
     else {
       if (
@@ -60,8 +79,17 @@ export class CategoryService {
         category = await this.catRepository.save({
           id,
           ...payload,
+          orderNo: payload.orderNo,
         });
       else throw new ConflictException('Category has already existed');
+    }
+    if (payload.orderNo) {
+      console.log('GO TO 2');
+
+      await this.catRepository.save({
+        id: findCateByOrder.id,
+        orderNo: currentOrder,
+      });
     }
 
     return {
@@ -96,6 +124,9 @@ export class CategoryService {
     const [res, total] = await this.catRepository.findAndCount({
       take: limit,
       skip: totalSkip,
+      order: {
+        orderNo: 'ASC',
+      },
     });
 
     return {

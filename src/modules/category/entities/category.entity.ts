@@ -15,6 +15,9 @@ export class CategoryEntity extends AbstractEntity {
   @Column({ type: 'boolean' })
   isAlbum: boolean;
 
+  @Column({ type: 'int' })
+  orderNo: number;
+
   @OneToMany(
     () => SubCategoryEntity,
     (subCategory: any) => subCategory.category,
