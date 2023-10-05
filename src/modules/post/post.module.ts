@@ -6,12 +6,20 @@ import { PostController } from './post.controller';
 import { PostEntity } from './entities/post.entity';
 import { PostService } from './services/post.service';
 import { ContentEntity } from './entities/content.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { UserPostEntity } from './entities/userpost.entity';
 
 @Module({
   controllers: [PostController],
   imports: [
     SharedModule,
-    TypeOrmModule.forFeature([PostEntity, ContentEntity, AbstractEntity]),
+    TypeOrmModule.forFeature([
+      PostEntity,
+      ContentEntity,
+      AbstractEntity,
+      UserEntity,
+      UserPostEntity,
+    ]),
   ],
   providers: [PostService],
 })

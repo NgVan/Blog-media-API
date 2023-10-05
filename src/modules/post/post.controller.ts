@@ -83,6 +83,7 @@ export class PostController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get One Post' })
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
@@ -92,7 +93,7 @@ export class PostController {
     @Req() request: AppRequest,
     @Param('postId') id: string,
   ): Promise<PostDto> {
-    return this.postService.getOne(id);
+    return this.postService.getOnePost(request, id);
   }
 
   @HttpCode(HttpStatus.OK)

@@ -137,8 +137,6 @@ export class UserController {
     @Req() request: AppRequest,
     @Param('postId') postId: string,
   ): Promise<UserDto> {
-    console.log('GOO CONTR');
-
     return this.userService.likePost(request, postId);
   }
 

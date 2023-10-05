@@ -16,6 +16,8 @@ import { PostDto } from '../dtos/response/post.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import { PostUpdateDto } from '../dtos/request/post-update.dto';
 import { PostQueryDto } from '../dtos/request/post-query.dto';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
+import { UserPostEntity } from '../entities/userpost.entity';
 
 @Injectable()
 export class PostService extends BaseService {
@@ -26,6 +28,10 @@ export class PostService extends BaseService {
     private postRepository: Repository<PostEntity>,
     @InjectRepository(ContentEntity)
     private contentRepository: Repository<ContentEntity>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+    @InjectRepository(UserPostEntity)
+    private userPostRepository: Repository<UserPostEntity>,
 
     private configService: ConfigService,
   ) {
@@ -141,7 +147,20 @@ export class PostService extends BaseService {
     };
   }
 
-  async getOne(id: string): Promise<any> {
+  async getOnePost(context: RequestContext, id: string): Promise<any> {
+    let likeStatus = false;
+    const user = get(context, 'user');
+    if (user) {
+      const findUser = await this.userRepository.findOneBy({ id: user.sub });
+      if (findUser) {
+        const findUserPost = await this.userPostRepository.findOneBy({
+          userId: user.sub,
+          postId: id,
+        });
+        if (findUserPost) likeStatus = true;
+      }
+    }
+
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.comments', 'c')
@@ -179,7 +198,7 @@ export class PostService extends BaseService {
       .limit(1)
       .getOne();
 
-    return { ...foundPost.toDto(), prevPost, nextPost };
+    return { ...foundPost.toDto(), likeStatus, prevPost, nextPost };
   }
 
   async getListPostByCategory(filter: PostQueryDto): Promise<any> {
