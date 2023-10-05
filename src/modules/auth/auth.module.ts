@@ -13,6 +13,7 @@ import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 import { AuthEntity } from './entities/auth.entity';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { FacebookStrategy } from './strategies/facebook.strategy';
+import { OptionalTokenStrategy } from './strategies/option-jwt.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -32,6 +33,7 @@ import { FacebookStrategy } from './strategies/facebook.strategy';
     GoogleStrategy,
     FacebookStrategy,
     EmailService,
+    OptionalTokenStrategy,
   ],
 })
 export class AuthModule {}

@@ -28,6 +28,7 @@ import { PermissionsGuard } from '../auth/guards/permission.guard';
 import { Permissions } from '../auth/guards/list.decorator';
 import { PermissionTypes } from 'src/utils/enum';
 import { PostQueryDto } from './dtos/request/post-query.dto';
+import { OptionalGuard } from '../auth/guards/option.guard';
 
 @ApiTags('Posts')
 @Controller('post')
@@ -83,7 +84,7 @@ export class PostController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get One Post' })
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(OptionalGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,

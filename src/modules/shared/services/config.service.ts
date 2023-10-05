@@ -184,6 +184,10 @@ export class ConfigService {
     return this.envConfig['JWT_REFRESH_SECRET'] || 'JWT REFRESH SECRET';
   }
 
+  get jwtOptionalTokenSecret(): string {
+    return this.envConfig['JWT_OPTIONAL_SECRET'] || 'JWT OPTIONAL SECRET';
+  }
+
   get authEmailAddressClaim(): string {
     return this.envConfig['AUTH0_EMAIL_ADDRESS_CLAIM'] || '';
   }

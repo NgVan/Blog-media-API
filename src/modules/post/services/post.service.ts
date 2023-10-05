@@ -150,6 +150,8 @@ export class PostService extends BaseService {
   async getOnePost(context: RequestContext, id: string): Promise<any> {
     let likeStatus = false;
     const user = get(context, 'user');
+    console.log('LOG USER: ', user);
+
     if (user) {
       const findUser = await this.userRepository.findOneBy({ id: user.sub });
       if (findUser) {
