@@ -150,7 +150,6 @@ export class PostService extends BaseService {
   async getOnePost(context: RequestContext, id: string): Promise<any> {
     let likeStatus = false;
     const user = get(context, 'user');
-    console.log('LOG USER: ', user);
 
     if (user) {
       const findUser = await this.userRepository.findOneBy({ id: user.sub });
@@ -282,7 +281,9 @@ export class PostService extends BaseService {
     };
   }
 
-  async getList(filter: PostQueryDto): Promise<any> {
+  async getList(context: RequestContext, filter: PostQueryDto): Promise<any> {
+    const user = get(context, 'user');
+
     const {
       page = DEFAULT_VALUE_FILTER.PAGE,
       limit = DEFAULT_VALUE_FILTER.LIMIT,
@@ -292,8 +293,20 @@ export class PostService extends BaseService {
       searchQuery,
     } = filter;
     const orderByLike: any = like;
-
     const totalSkip = limit * (page - 1);
+
+    const likedPostIds = [];
+    if (user) {
+      const findUser = await this.userRepository.findOneBy({ id: user.sub });
+      if (findUser) {
+        const findUserPostByUser = await this.userPostRepository.findBy({
+          userId: user.sub,
+        });
+
+        if (findUserPostByUser)
+          findUserPostByUser.forEach((i) => likedPostIds.push(i.postId));
+      }
+    }
 
     const query = this.postRepository
       .createQueryBuilder('post')
@@ -318,9 +331,16 @@ export class PostService extends BaseService {
         .addOrderBy('post.created', 'DESC');
     }
     const [res, total] = await query.clone().getManyAndCount();
+    // const addLikeStatusRes = []
+    const addLikeStatusRes = res.map((i) => {
+      return {
+        ...i,
+        likeStatus: likedPostIds.includes(i.id),
+      };
+    });
 
     return {
-      entities: res,
+      entities: addLikeStatusRes,
       totalEntities: total,
     };
   }

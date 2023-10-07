@@ -12,6 +12,10 @@ import { CatQueryDto } from '../dtos/request/CatQuery.dto';
 import { DEFAULT_VALUE_FILTER } from 'src/utils/constant';
 import { CategoryDto } from '../dtos/response/cat.dto';
 import { PostEntity } from 'src/modules/post/entities/post.entity';
+import { get } from 'lodash';
+import { RequestContext } from 'src/utils/request-context';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
+import { UserPostEntity } from 'src/modules/post/entities/userpost.entity';
 
 @Injectable()
 export class CategoryService {
@@ -20,6 +24,10 @@ export class CategoryService {
     private catRepository: Repository<CategoryEntity>,
     @InjectRepository(PostEntity)
     private postRepository: Repository<PostEntity>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+    @InjectRepository(UserPostEntity)
+    private userPostRepository: Repository<UserPostEntity>,
   ) {}
 
   async create(payload: CreateCatDto): Promise<any> {
@@ -135,14 +143,38 @@ export class CategoryService {
     };
   }
 
-  async getPostList(): Promise<any> {
+  async getPostList(context: RequestContext): Promise<any> {
+    const user = get(context, 'user');
+    console.log('USER: ', user);
+
+    const likedPostIds = [];
+    if (user) {
+      const findUser = await this.userRepository.findOneBy({ id: user.sub });
+      if (findUser) {
+        const findUserPostByUser = await this.userPostRepository.findBy({
+          userId: user.sub,
+        });
+
+        if (findUserPostByUser)
+          findUserPostByUser.forEach((i) => likedPostIds.push(i.postId));
+      }
+    }
+    console.log({ likedPostIds });
+
     const categories = await this.catRepository.find({});
 
     const categoriesWithPosts = await Promise.all(
       categories.map(async (category) => {
         const posts = await this.getTopFourPosts(category.id);
+        const addLikeStatusPosts = posts.map((i) => {
+          return {
+            ...i,
+            likeStatus: likedPostIds.includes(i.id),
+          };
+        });
         delete category.subCategories;
-        if (posts && posts.length > 0) return { ...category, posts };
+        if (posts && posts.length > 0)
+          return { ...category, posts: addLikeStatusPosts };
       }),
     );
     const result = categoriesWithPosts.filter((i) => i !== undefined);

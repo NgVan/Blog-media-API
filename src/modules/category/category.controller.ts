@@ -27,6 +27,7 @@ import { CatFilterDto } from './dtos/response/cat-filter.dto';
 import { PermissionTypes } from 'src/utils/enum';
 import { Permissions } from '../auth/guards/list.decorator';
 import { PermissionsGuard } from '../auth/guards/permission.guard';
+import { OptionalGuard } from '../auth/guards/option.guard';
 
 @ApiTags('Categories')
 @Controller('category')
@@ -79,13 +80,14 @@ export class CategoryController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get List Category with Post' })
+  @UseGuards(OptionalGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
   })
   @Get('post')
   getPostList(@Req() request: AppRequest): Promise<any> {
-    return this.categoryService.getPostList();
+    return this.categoryService.getPostList(request);
   }
 
   @HttpCode(HttpStatus.OK)

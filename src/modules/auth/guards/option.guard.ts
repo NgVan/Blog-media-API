@@ -14,6 +14,5 @@ export class OptionalGuard extends AuthGuard(['optional-jwt']) {
     // }
     console.log('Token in option token: ', user);
     return user;
-    // return { name: 'van1', age: '121' };
   }
 }

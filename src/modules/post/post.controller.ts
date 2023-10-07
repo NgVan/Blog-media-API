@@ -70,6 +70,7 @@ export class PostController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get List Post' })
+  @UseGuards(OptionalGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS,
@@ -79,7 +80,7 @@ export class PostController {
     @Req() request: AppRequest,
     @Query() filter: PostQueryDto,
   ): Promise<any> {
-    return this.postService.getList(filter);
+    return this.postService.getList(request, filter);
   }
 
   @HttpCode(HttpStatus.OK)
