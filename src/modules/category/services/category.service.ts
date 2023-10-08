@@ -145,7 +145,6 @@ export class CategoryService {
 
   async getPostList(context: RequestContext): Promise<any> {
     const user = get(context, 'user');
-    console.log('USER: ', user);
 
     const likedPostIds = [];
     if (user) {
@@ -161,7 +160,11 @@ export class CategoryService {
     }
     console.log({ likedPostIds });
 
-    const categories = await this.catRepository.find({});
+    const categories = await this.catRepository.find({
+      order: {
+        orderNo: 'ASC',
+      },
+    });
 
     const categoriesWithPosts = await Promise.all(
       categories.map(async (category) => {

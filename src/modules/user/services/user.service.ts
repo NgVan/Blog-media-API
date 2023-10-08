@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Brackets } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { get, isEmpty, omit } from 'lodash';
@@ -21,6 +21,7 @@ import { PermissionTypes, RoleTypes } from 'src/utils/enum';
 import { AuthEntity } from 'src/modules/auth/entities/auth.entity';
 import { UserPostEntity } from 'src/modules/post/entities/userpost.entity';
 import { PostEntity } from 'src/modules/post/entities/post.entity';
+import { UserQueryDto } from '../dtos/request/user-quey.dto';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -101,18 +102,34 @@ export class UserService extends BaseService {
     };
   }
 
-  async getListUserByFilter(filterParam: AbstractFilterDto): Promise<any> {
+  async getListUserByFilter(filterParam: UserQueryDto): Promise<any> {
     const {
       page = DEFAULT_VALUE_FILTER.PAGE,
       limit = DEFAULT_VALUE_FILTER.LIMIT,
+      userName,
     } = filterParam;
     const totalSkip = (page - 1) * limit;
 
-    const [result, total] = await this.userRepository.findAndCount({
-      take: limit,
-      skip: totalSkip,
-      // withDeleted: withDeleted?.toString() === 'true',
-    });
+    // const [result, total] = await this.userRepository.findAndCount({
+    //   take: limit,
+    //   skip: totalSkip,
+    //   // withDeleted: withDeleted?.toString() === 'true',
+    // });
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .where(
+        new Brackets((query) => {
+          query
+            .where('user.userName LIKE :userName')
+            .orWhere('user.displayName LIKE :userName');
+        }),
+      )
+      .setParameters({ userName: `%${userName.trim()}%` })
+      .take(limit)
+      .skip(totalSkip);
+
+    const [result, total] = await query.clone().getManyAndCount();
+
     const res = result.map((user) => new UserDto(user));
     console.log({ result, total });
 
