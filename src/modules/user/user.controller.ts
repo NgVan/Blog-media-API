@@ -84,7 +84,7 @@ export class UserController {
     type: UserFilterDto,
   })
   @UseGuards(AccessTokenGuard, PermissionsGuard)
-  @Permissions(PermissionTypes.USER)
+  @Permissions(PermissionTypes.COMMENT)
   @HttpCode(HttpStatus.OK)
   @Get('Filter')
   getList(
@@ -97,7 +97,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get One User' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: UserDto })
   @UseGuards(AccessTokenGuard, PermissionsGuard)
-  @Permissions(PermissionTypes.USER)
+  @Permissions(PermissionTypes.COMMENT)
   @HttpCode(HttpStatus.OK)
   @Get(':userId')
   getUserProfile(

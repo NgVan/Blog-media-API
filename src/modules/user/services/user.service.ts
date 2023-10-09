@@ -47,7 +47,8 @@ export class UserService extends BaseService {
   ): Promise<any> {
     const { emailAddress, password, permissions } = payload;
     console.log({ password, permissions });
-    permissions.push(PermissionTypes.COMMENT);
+    if (!permissions.includes('COMMENT'))
+      permissions.push(PermissionTypes.COMMENT);
     const checkExistedUser = await this.userRepository.findOneBy({
       emailAddress,
     });

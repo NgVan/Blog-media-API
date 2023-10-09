@@ -148,6 +148,18 @@ export class PostService extends BaseService {
   }
 
   async getOnePost(context: RequestContext, id: string): Promise<any> {
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.comments', 'c')
+      .leftJoinAndSelect('post.contents', 'ct')
+      .leftJoinAndSelect('post.subCategory', 'subCa')
+      // .leftJoinAndSelect('subCa.category', 'cate')
+      .leftJoin('c.user', 'u')
+      .where('post.id = :id', { id })
+      .addSelect(['u.userName']);
+    const foundPost = await query.getOne();
+    if (!foundPost) throw new NotFoundException('Not found post');
+
     let likeStatus = false;
     const user = get(context, 'user');
 
@@ -162,21 +174,8 @@ export class PostService extends BaseService {
       }
     }
 
-    const query = this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.comments', 'c')
-      .leftJoinAndSelect('post.contents', 'ct')
-      .leftJoinAndSelect('post.subCategory', 'subCa')
-      // .leftJoinAndSelect('subCa.category', 'cate')
-      .leftJoin('c.user', 'u')
-      .where('post.id = :id', { id })
-      .addSelect(['u.userName']);
-
-    const foundPost = await query.getOne();
     const categoryId = foundPost.subCategory.categoryId;
     delete foundPost['subCategory'];
-
-    if (!foundPost) throw new NotFoundException('Not found post');
 
     const prevPost = await this.postRepository
       .createQueryBuilder('post')
@@ -349,6 +348,7 @@ export class PostService extends BaseService {
     const foundPost = await this.postRepository.findOneBy({ id });
     if (!foundPost) throw new NotFoundException('Not found post');
     try {
+      await this.userPostRepository.delete({ postId: foundPost.id });
       await this.contentRepository.delete({ postId: foundPost.id });
       await this.postRepository.delete(foundPost.id);
     } catch (error) {
