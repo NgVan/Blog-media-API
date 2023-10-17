@@ -84,6 +84,20 @@ export class PostController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get List Post Need Accept' })
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.FLATFORM_ADMIN)
+  @UseGuards(OptionalGuard)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: SUCCESS,
+  })
+  @Get('needAccept')
+  getListNeedAccept(@Query() filter: PostQueryDto): Promise<any> {
+    return this.postService.getListNeedAccept(filter);
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get One Post' })
   @UseGuards(OptionalGuard)
   @ApiResponse({

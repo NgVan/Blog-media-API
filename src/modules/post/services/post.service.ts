@@ -18,6 +18,7 @@ import { PostUpdateDto } from '../dtos/request/post-update.dto';
 import { PostQueryDto } from '../dtos/request/post-query.dto';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { UserPostEntity } from '../entities/userpost.entity';
+import { AbstractFilterDto } from 'src/database/dtos/abstract-filter.dto';
 
 @Injectable()
 export class PostService extends BaseService {
@@ -344,6 +345,43 @@ export class PostService extends BaseService {
 
     return {
       entities: addLikeStatusRes,
+      totalEntities: total,
+    };
+  }
+
+  async getListNeedAccept(filter: PostQueryDto): Promise<any> {
+    const {
+      page = DEFAULT_VALUE_FILTER.PAGE,
+      limit = DEFAULT_VALUE_FILTER.LIMIT,
+      searchQuery,
+      categoryId,
+      subCategoryId,
+    } = filter;
+    const totalSkip = limit * (page - 1);
+
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .innerJoin('post.subCategory', 'subCategory')
+      .innerJoin('subCategory.category', 'category')
+      .orderBy('post.created', 'DESC')
+      .where(
+        new Brackets((query) => {
+          query.where('post.title LIKE :searchQuery');
+        }),
+      )
+      .andWhere('post.isAccess = :isAccess', { isAccess: 0 })
+      .setParameters({ searchQuery: `%${searchQuery}%` })
+      .take(limit)
+      .skip(totalSkip);
+
+    if (subCategoryId)
+      query.andWhere('subCategory.id = :subCategoryId', { subCategoryId });
+    if (categoryId) query.andWhere('category.id = :categoryId', { categoryId });
+
+    const [res, total] = await query.clone().getManyAndCount();
+
+    return {
+      entities: res,
       totalEntities: total,
     };
   }
