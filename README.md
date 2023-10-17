@@ -71,3 +71,17 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+```
+- Tìm kiếm bài viết theo title
+    - Ở Home: tìm kiếm all
+    - Ở Category page: tìm kiếm trong category
+- Tìm kiếm người dùng
+- Trang thông tin người dùng bao gồm: Avatar, username, danh sách bài viết, Số điểm đóng góp, số người mà khứa này follow, số người follow khứa này
+- Chủ đề: thêm field thứ tự
+- Chỉnh sửa chủ đề: đổi giao diện danh sách chủ đề thành như header
+- Bài viết
+    - Content text: Font chữ (như word), emoji
+    - Kiểm duyệt bài viết: sau khi tạo sẽ ở trạng thái chưa kiểm duyệt, admin kiểm duyệt mới hiển thị lên UI
+    - Admin có thể kiểm duyệt bài viết ở màn hình quản lý nội dung
+    - Admin có quyền xoá bài viết
+```

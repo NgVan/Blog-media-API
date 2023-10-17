@@ -140,6 +140,17 @@ export class UserController {
     return this.userService.likePost(request, postId);
   }
 
+  @ApiOperation({ summary: 'Admin Access Post' })
+  @ApiResponse({ status: HttpStatus.OK, description: SUCCESS })
+  @UseGuards(AccessTokenGuard, PermissionsGuard)
+  @Permissions(PermissionTypes.FLATFORM_ADMIN)
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Put('/post/access/:postId')
+  accessPost(@Param('postId') postId: string): Promise<UserDto> {
+    return this.userService.accessPost(postId);
+  }
+
   @ApiOperation({ summary: 'Delete One User' })
   @ApiResponse({ status: HttpStatus.OK, description: SUCCESS, type: Boolean })
   @HttpCode(HttpStatus.OK)

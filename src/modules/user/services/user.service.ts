@@ -247,6 +247,22 @@ export class UserService extends BaseService {
     }
   }
 
+  async accessPost(postId: string): Promise<any> {
+    try {
+      const findPost = await this.postRepository.findOneBy({ id: postId });
+      if (!findPost) throw new NotFoundException('Post not found');
+      if (findPost.isAccess)
+        throw new BadRequestException('Post already is accepted');
+      await this.postRepository.save({
+        id: postId,
+        isAccess: 1,
+      });
+      return { message: 'Accept Post Successfully' };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async findUser(emailAddress: string): Promise<any> {
     const user = await this.userRepository.findOneBy({ emailAddress });
     return user;

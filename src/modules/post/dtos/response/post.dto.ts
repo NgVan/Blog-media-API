@@ -16,6 +16,7 @@ export class PostDto extends AbstractDto {
     this.subCategoryId = postEntity.subCategoryId;
     this.contents = postEntity.contents;
     this.comments = postEntity.comments;
+    this.isAccess = postEntity.isAccess;
   }
   @ApiProperty({ required: false })
   title: string;
@@ -28,6 +29,9 @@ export class PostDto extends AbstractDto {
 
   @ApiProperty({ required: false })
   like: number;
+
+  @ApiProperty({ required: false })
+  isAccess: number;
 
   @ApiProperty({ required: false })
   author: string;

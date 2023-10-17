@@ -23,6 +23,9 @@ export class PostEntity extends AbstractEntity {
   @Column({ type: 'int' })
   like: number;
 
+  @Column({ type: 'int' })
+  isAccess: number;
+
   @Column({ type: 'varchar', length: 50 })
   author: string;
 

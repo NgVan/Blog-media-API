@@ -58,6 +58,7 @@ export class PostService extends BaseService {
         description,
         picture,
         author: userName,
+        isAccess: 0,
       });
     } catch (error) {
       throw new BadRequestException(error);
@@ -182,6 +183,7 @@ export class PostService extends BaseService {
       .leftJoin('post.subCategory', 'subCa')
       .leftJoin('subCa.category', 'cate')
       .where('cate.id = :categoryId', { categoryId })
+      .andWhere('post.isAccess = :isAccess', { isAccess: 1 })
       .andWhere('post.created < :created', { created: foundPost.created })
       .orderBy('post.created', 'DESC')
       .limit(1)
@@ -192,6 +194,7 @@ export class PostService extends BaseService {
       .leftJoin('post.subCategory', 'subCa')
       .leftJoin('subCa.category', 'cate')
       .where('cate.id = :categoryId', { categoryId })
+      .andWhere('post.isAccess = :isAccess', { isAccess: 1 })
       .andWhere('post.created > :created', { created: foundPost.created })
       .andWhere('post.id != :postId', { postId: foundPost.id })
       .orderBy('post.created', 'ASC')
@@ -317,6 +320,7 @@ export class PostService extends BaseService {
           query.where('post.title LIKE :searchQuery');
         }),
       )
+      .andWhere('post.isAccess = :isAccess', { isAccess: 1 })
       .setParameters({ searchQuery: `%${searchQuery}%` })
       .take(limit)
       .skip(totalSkip);

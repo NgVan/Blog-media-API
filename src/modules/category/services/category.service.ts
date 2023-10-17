@@ -206,6 +206,7 @@ export class CategoryService {
       .innerJoin('post.subCategory', 'subCategory') // Liên kết với SubCategory
       .innerJoin('subCategory.category', 'category') // Liên kết với Category
       .where('category.id = :categoryId', { categoryId })
+      .andWhere('post.isAccess = :isAccess', { isAccess: 1 })
       .orderBy('post.created', 'DESC')
       .limit(4)
       .getMany();
