@@ -154,15 +154,7 @@ export class UserService extends BaseService {
     if (!data) throw new NotFoundException('User not found');
     return {
       data: {
-        ...omit(data, [
-          'id',
-          'emailVerified',
-          'created',
-          'modified',
-          'deleted',
-          'password',
-          'permission',
-        ]),
+        ...omit(data, ['deleted', 'password', 'permission']),
         permissions: data.permission.split('-'),
       },
       message: 'Get current user successfully',
