@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../../database/entities/abstract.entity';
 import { CommentEntity } from '../../comment/entities/comment.entity';
 import { UserPostEntity } from 'src/modules/post/entities/userpost.entity';
+import { PostEntity } from 'src/modules/post/entities/post.entity';
 
 export const USER_TABLE = 'user';
 
@@ -49,4 +50,14 @@ export class UserEntity extends AbstractEntity {
     cascade: true,
   })
   userPosts: UserPostEntity[];
+
+  @OneToMany(
+    () => PostEntity,
+    (post: any) => post.user,
+    // {
+    //   eager: true,
+    //   cascade: true,
+    // }
+  )
+  posts: PostEntity[];
 }

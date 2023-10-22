@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { Column, Entity, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../../database/entities/abstract.entity';
 import { ContentEntity } from './content.entity';
 import { SubCategoryEntity } from 'src/modules/category/entities/subCategory.entity';
 import { PostDto } from '../dtos/response/post.dto';
 import { CommentEntity } from '../../comment/entities/comment.entity';
 import { UserPostEntity } from './userpost.entity';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
 
 export const POST_TABLE = 'post';
 
@@ -31,6 +32,9 @@ export class PostEntity extends AbstractEntity {
 
   @Column({ type: 'varchar', length: 36 })
   subCategoryId: string;
+
+  @Column({ type: 'varchar', length: 36 })
+  userId: string;
 
   @OneToMany(
     () => ContentEntity,
@@ -62,6 +66,9 @@ export class PostEntity extends AbstractEntity {
 
   @ManyToOne(() => SubCategoryEntity, (subCate) => subCate.posts)
   subCategory: SubCategoryEntity;
+
+  @ManyToOne(() => UserEntity, (user) => user.posts)
+  user: UserEntity;
 
   toDto(): PostDto {
     const dto = new PostDto(this);

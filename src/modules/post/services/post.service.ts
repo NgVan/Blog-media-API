@@ -292,6 +292,7 @@ export class PostService extends BaseService {
       limit = DEFAULT_VALUE_FILTER.LIMIT,
       categoryId,
       subCategoryId,
+      userId,
       like,
       searchQuery,
     } = filter;
@@ -313,6 +314,7 @@ export class PostService extends BaseService {
 
     const query = this.postRepository
       .createQueryBuilder('post')
+      .innerJoin('post.user', 'user')
       .innerJoin('post.subCategory', 'subCategory')
       .innerJoin('subCategory.category', 'category')
       .orderBy('post.created', 'DESC')
@@ -326,6 +328,7 @@ export class PostService extends BaseService {
       .take(limit)
       .skip(totalSkip);
 
+    if (userId) query.andWhere('user.id = :userId', { userId });
     if (subCategoryId)
       query.andWhere('subCategory.id = :subCategoryId', { subCategoryId });
     if (categoryId) query.andWhere('category.id = :categoryId', { categoryId });

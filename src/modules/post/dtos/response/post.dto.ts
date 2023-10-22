@@ -4,6 +4,7 @@ import { PostEntity } from '../../entities/post.entity';
 import { SubCategoryEntity } from 'src/modules/category/entities/subCategory.entity';
 import { ContentEntity } from '../../entities/content.entity';
 import { CommentEntity } from '../../../comment/entities/comment.entity';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
 
 export class PostDto extends AbstractDto {
   constructor(postEntity: PostEntity = <PostEntity>{}) {
@@ -14,6 +15,7 @@ export class PostDto extends AbstractDto {
     this.author = postEntity.author;
     this.like = postEntity.like;
     this.subCategoryId = postEntity.subCategoryId;
+    this.userId = postEntity.userId;
     this.contents = postEntity.contents;
     this.comments = postEntity.comments;
     this.isAccess = postEntity.isAccess;
@@ -40,7 +42,13 @@ export class PostDto extends AbstractDto {
   subCategoryId: string;
 
   @ApiProperty({ required: false })
+  userId: string;
+
+  @ApiProperty({ required: false })
   subCategory: SubCategoryEntity;
+
+  @ApiProperty({ required: false })
+  user: UserEntity;
 
   @ApiProperty({ required: false })
   contents: ContentEntity[];
