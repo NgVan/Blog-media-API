@@ -19,6 +19,7 @@ import { PostQueryDto } from '../dtos/request/post-query.dto';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { UserPostEntity } from '../entities/userpost.entity';
 import { AbstractFilterDto } from 'src/database/dtos/abstract-filter.dto';
+import { SubCategoryEntity } from 'src/modules/category/entities/subCategory.entity';
 
 @Injectable()
 export class PostService extends BaseService {
@@ -33,6 +34,8 @@ export class PostService extends BaseService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(UserPostEntity)
     private userPostRepository: Repository<UserPostEntity>,
+    @InjectRepository(SubCategoryEntity)
+    private subCategoryRepository: Repository<SubCategoryEntity>,
 
     private configService: ConfigService,
   ) {
@@ -47,10 +50,15 @@ export class PostService extends BaseService {
       picture,
       contents: contentsBody,
     } = payload;
+    const foundSubCategory = await this.subCategoryRepository.findOneBy({
+      id: subCategoryId,
+    });
+    if (!foundSubCategory) throw new NotFoundException('SubCategory not found');
 
     const contents = JSON.parse(contentsBody);
 
-    const userName = get(context, 'user.userName');
+    const getUser = get(context, 'user');
+
     let post: any;
     try {
       post = await this.postRepository.save({
@@ -58,8 +66,9 @@ export class PostService extends BaseService {
         subCategoryId,
         description,
         picture,
-        author: userName,
+        author: getUser.userName,
         isAccess: 0,
+        userId: getUser.sub,
       });
     } catch (error) {
       throw new BadRequestException(error);

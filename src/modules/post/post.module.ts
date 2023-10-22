@@ -8,6 +8,7 @@ import { PostService } from './services/post.service';
 import { ContentEntity } from './entities/content.entity';
 import { UserEntity } from '../user/entities/user.entity';
 import { UserPostEntity } from './entities/userpost.entity';
+import { SubCategoryEntity } from '../category/entities/subCategory.entity';
 
 @Module({
   controllers: [PostController],
@@ -19,6 +20,7 @@ import { UserPostEntity } from './entities/userpost.entity';
       AbstractEntity,
       UserEntity,
       UserPostEntity,
+      SubCategoryEntity,
     ]),
   ],
   providers: [PostService],
