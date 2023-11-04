@@ -91,7 +91,7 @@ export class UserController {
     @Req() request: AppRequest,
     @Query() filter: UserQueryDto,
   ): Promise<UserFilterDto> {
-    return this.userService.getListUserByFilter(filter);
+    return this.userService.getListUserByFilter(request, filter);
   }
 
   @ApiOperation({ summary: 'Get One User' })
@@ -103,7 +103,7 @@ export class UserController {
   getUserProfile(
     @Req() request: AppRequest,
     @Param('userId') userId: string,
-  ): Promise<UserDto> {
+  ): Promise<any> {
     return this.userService.getUserProfile(request, userId);
   }
 
@@ -138,6 +138,18 @@ export class UserController {
     @Param('postId') postId: string,
   ): Promise<UserDto> {
     return this.userService.likePost(request, postId);
+  }
+
+  @ApiOperation({ summary: 'Follow User' })
+  @ApiResponse({ status: HttpStatus.OK, description: SUCCESS })
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('/followUser/:userId')
+  followUser(
+    @Req() request: AppRequest,
+    @Param('userId') userId: string,
+  ): Promise<any> {
+    return this.userService.followUser(request, userId);
   }
 
   @ApiOperation({ summary: 'Admin Access Post' })

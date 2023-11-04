@@ -8,6 +8,7 @@ import { AbstractEntity } from 'src/database/entities/abstract.entity';
 import { AuthEntity } from '../auth/entities/auth.entity';
 import { UserPostEntity } from '../post/entities/userpost.entity';
 import { PostEntity } from '../post/entities/post.entity';
+import { FollowUserEntity } from './entities/followUser.entity';
 
 @Module({
   controllers: [UserController],
@@ -19,6 +20,7 @@ import { PostEntity } from '../post/entities/post.entity';
       AuthEntity,
       UserPostEntity,
       PostEntity,
+      FollowUserEntity,
     ]),
   ],
   providers: [UserService],

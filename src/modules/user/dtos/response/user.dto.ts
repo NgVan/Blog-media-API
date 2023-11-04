@@ -12,6 +12,8 @@ export class UserDto extends AbstractDto {
     this.userName = userEntity?.userName;
     this.displayName = userEntity?.displayName;
     this.emailAddress = userEntity?.emailAddress;
+    this.follower = userEntity?.follower;
+    this.following = userEntity?.following;
     // this.emailVerified = userEntity?.emailVerified;
     this.phoneNumber = userEntity?.phoneNumber;
     this.picture = userEntity?.picture;
@@ -29,6 +31,12 @@ export class UserDto extends AbstractDto {
 
   @ApiProperty({ required: false })
   emailAddress: string;
+
+  @ApiProperty({ required: false })
+  follower: number;
+
+  @ApiProperty({ required: false })
+  following: number;
 
   // @ApiProperty({ required: false })
   // emailVerified: boolean;

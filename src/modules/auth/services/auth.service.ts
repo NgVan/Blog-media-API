@@ -151,6 +151,8 @@ export class AuthService {
           role: RoleTypes.USER,
           permission: PermissionTypes.COMMENT,
           emailVerified: false,
+          follower: 0,
+          following: 0,
         });
       } catch (error) {
         throw new BadRequestException(error);
@@ -395,6 +397,8 @@ export class AuthService {
           picture,
           role: RoleTypes.USER,
           permission: PermissionTypes.COMMENT,
+          follower: 0,
+          following: 0,
         });
         const emailTilte = 'Welcom! You are signup successfully';
         await this.emailService.sendSignupMail(

@@ -22,6 +22,7 @@ import { AuthEntity } from 'src/modules/auth/entities/auth.entity';
 import { UserPostEntity } from 'src/modules/post/entities/userpost.entity';
 import { PostEntity } from 'src/modules/post/entities/post.entity';
 import { UserQueryDto } from '../dtos/request/user-quey.dto';
+import { FollowUserEntity } from '../entities/followUser.entity';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -36,6 +37,8 @@ export class UserService extends BaseService {
     private userPostRepository: Repository<UserPostEntity>,
     @InjectRepository(PostEntity)
     private postRepository: Repository<PostEntity>,
+    @InjectRepository(FollowUserEntity)
+    private followUserRepository: Repository<FollowUserEntity>,
     private configService: ConfigService,
   ) {
     super(userRepository, 'User');
@@ -65,6 +68,8 @@ export class UserService extends BaseService {
         password: hashedPassword,
         role: RoleTypes.USER,
         permission: permissions.join('-'),
+        follower: 0,
+        following: 0,
       });
     } catch (error) {
       throw new BadRequestException(error);
@@ -103,7 +108,11 @@ export class UserService extends BaseService {
     };
   }
 
-  async getListUserByFilter(filterParam: UserQueryDto): Promise<any> {
+  async getListUserByFilter(
+    context: RequestContext,
+    filterParam: UserQueryDto,
+  ): Promise<any> {
+    const user = get(context, 'user');
     const {
       page = DEFAULT_VALUE_FILTER.PAGE,
       limit = DEFAULT_VALUE_FILTER.LIMIT,
@@ -111,11 +120,6 @@ export class UserService extends BaseService {
     } = filterParam;
     const totalSkip = (page - 1) * limit;
 
-    // const [result, total] = await this.userRepository.findAndCount({
-    //   take: limit,
-    //   skip: totalSkip,
-    //   // withDeleted: withDeleted?.toString() === 'true',
-    // });
     const query = this.userRepository
       .createQueryBuilder('user')
       .where(
@@ -130,32 +134,66 @@ export class UserService extends BaseService {
       .skip(totalSkip);
 
     const [result, total] = await query.clone().getManyAndCount();
-
     const res = result.map((user) => new UserDto(user));
-    console.log({ result, total });
+
+    // Kiểm tra xem User_A đã theo dõi những User nào trong danh sách User được tìm thấy?
+    const findFollowUser = await this.followUserRepository.findBy({
+      followerId: user.sub,
+    });
+    const trackedUserId = findFollowUser.map((i) => i.trackedUserId);
+    const addFollowStatusRes = res.map((i) => {
+      return {
+        ...i,
+        followUserStatus: trackedUserId.includes(i.id),
+      };
+    });
 
     return {
-      entities: res,
+      entities: addFollowStatusRes,
       totalEntities: total,
     };
   }
 
-  async getUserProfile(_context: RequestContext, id: string): Promise<UserDto> {
+  async getUserProfile(context: RequestContext, id: string): Promise<any> {
+    const user = get(context, 'user');
     const data = await this.userRepository.findOneBy({ id });
     if (!data) throw new NotFoundException('User not found');
+
+    // find total like number of all post created this user
+    let totalPostLike = 0;
+    const findPosts = await this.postRepository.findBy({ userId: id });
+    findPosts.forEach((i) => {
+      totalPostLike += i.like;
+    });
+
+    // Check whether User_A follow User_B or not?
+    const findFollowUser = await this.followUserRepository.findOneBy({
+      followerId: user.sub,
+      trackedUserId: id,
+    });
+    const followUserStatus = findFollowUser ? true : false;
+
     const userDto = new UserDto(data);
 
-    return <UserDto>omit(userDto);
+    return { ...(<UserDto>omit(userDto)), totalPostLike, followUserStatus };
   }
 
   async getCurrentUser(context: RequestContext): Promise<any> {
     const user = get(context, 'user');
     const data = await this.userRepository.findOneBy({ id: user.sub });
     if (!data) throw new NotFoundException('User not found');
+
+    // find total like number of all post created this user
+    let totalPostLike = 0;
+    const findPosts = await this.postRepository.findBy({ userId: user.sub });
+    findPosts.forEach((i) => {
+      totalPostLike += i.like;
+    });
     return {
       data: {
         ...omit(data, ['deleted', 'password', 'permission']),
         permissions: data.permission.split('-'),
+        totalPostLike,
       },
       message: 'Get current user successfully',
     };
@@ -232,6 +270,69 @@ export class UserService extends BaseService {
           like: findPost.like - 1,
         });
         result = 'DisLike Post Successfully';
+      }
+      return { message: result };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async followUser(context: RequestContext, userId: string): Promise<any> {
+    try {
+      const user = get(context, 'user');
+      // Find User_A
+      const followerUser = await this.userRepository.findOneBy({
+        id: user.sub,
+      });
+      if (!followerUser) throw new NotFoundException('Follower user not found');
+
+      // Find User_B
+      const trackedUser = await this.userRepository.findOneBy({ id: userId });
+      if (!trackedUser) throw new NotFoundException('Tracker user not found');
+
+      const findFollowUser = await this.followUserRepository.findOneBy({
+        followerId: user.sub,
+        trackedUserId: userId,
+      });
+      let result = '';
+      if (!findFollowUser) {
+        // Tình huống: User_A theo dõi User_B
+        await this.followUserRepository.save({
+          followerId: user.sub, // User_A
+          trackedUserId: userId, // User_B
+        });
+
+        // Update User_A: cột "Đang theo dõi (following)"": tăng lên 1
+        await this.userRepository.save({
+          id: user.sub,
+          following: followerUser.following + 1,
+        });
+
+        // Update User_B: cột "Follower (follower)"": tăng lên 1
+        await this.userRepository.save({
+          id: userId,
+          follower: trackedUser.follower + 1,
+        });
+        result = 'Follow User Successfully';
+      } else {
+        // Tình huống: User_A hủy theo dõi User_B
+        await this.followUserRepository.delete({
+          followerId: user.sub, // User_A
+          trackedUserId: userId, // User_B
+        });
+
+        // Update User_A: cột "Đang theo dõi (following)"": giảm đi 1
+        await this.userRepository.save({
+          id: user.sub,
+          following: followerUser.following - 1,
+        });
+
+        // Update User_B: cột "Follower (follower)"": giảm đi 1
+        await this.userRepository.save({
+          id: userId,
+          follower: trackedUser.follower - 1,
+        });
+        result = 'Un-follow User Successfully';
       }
       return { message: result };
     } catch (error) {
