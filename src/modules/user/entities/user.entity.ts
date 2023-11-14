@@ -17,10 +17,10 @@ export class UserEntity extends AbstractEntity {
   displayName: string;
 
   @Column({ type: 'int' })
-  follower: number;
+  follower: number; // số lượng User đang theo dõi User_this này
 
   @Column({ type: 'int' })
-  following: number;
+  following: number; // Số lượng User mà User_this này đang theo dõi
 
   @Column({ type: 'varchar', length: 100, unique: true })
   emailAddress: string;

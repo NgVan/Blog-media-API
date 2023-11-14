@@ -207,14 +207,14 @@ export class UserService extends BaseService {
     context: RequestContext,
     payload: UserUpdateProfileDto,
   ): Promise<any> {
-    const { userName, phoneNumber, picture } = payload;
+    const { displayName, phoneNumber, picture } = payload;
     const user = get(context, 'user');
     const data = await this.userRepository.findOneBy({ id: user.sub });
     if (!data) throw new NotFoundException('User not found');
     try {
       await this.userRepository.save({
         id: data.id,
-        userName,
+        displayName,
         phoneNumber,
         picture,
       });

@@ -7,7 +7,7 @@ export class UserUpdateProfileDto {
   @IsString()
   @IsOptional()
   @Length(1, 100)
-  userName: string;
+  displayName: string;
 
   @ApiProperty()
   @IsString()
