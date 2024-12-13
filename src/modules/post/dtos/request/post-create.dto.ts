@@ -23,5 +23,5 @@ export class PostCreateDto {
   @ApiProperty()
   @IsArray()
   @IsNotEmpty()
-  contents: object[];
+  contents: object[]; //
 }
